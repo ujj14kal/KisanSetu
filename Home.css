@@ -13,12 +13,13 @@ body {
   padding-top: 110px;
   background-image:
     linear-gradient(
-      rgba(244, 248, 243, 0.92),
-      rgba(244, 248, 243, 0.92)
+      rgba(244, 248, 243, 0.6),
+      rgba(244, 248, 243, 0.9)
     ),
     url("Assets/Images/Farm.webp");
   background-size: cover;
   background-position: center;
+
 }
 
 
@@ -239,16 +240,16 @@ body {
   grid-template-columns: repeat(2, 1fr);
   gap: 40px;
 
-  max-width: 380px;      
-  margin: 0 auto;       
+  max-width: 420px;      
+  margin: 3 auto;       
 }
+
 
 
 /* LINK LIST */
 .footer-links-grid ul {
   list-style: none;
   padding: 0;
-  margin: 0;
 }
 
 .footer-links-grid li {
