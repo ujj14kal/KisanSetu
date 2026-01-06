@@ -1,0 +1,88 @@
+/* GLOBAL */
+body {
+  background-color: #f4f8f3;
+  font-family: 'Segoe UI', sans-serif;
+  color: #2f2f2f;
+
+}
+
+/* HERO SECTION */
+.hero-section {
+  min-height: 85vh;  
+  padding-bottom: 80px;
+  padding-top: 110px;
+  background-image:
+    linear-gradient(
+      rgba(244, 248, 243, 0.92),
+      rgba(244, 248, 243, 0.92)
+    ),
+    url("../assets/images/farming.png");
+  background-size: cover;
+  background-position: center;
+}
+
+
+
+/* HERO TEXT */
+.hero-section h1 {
+  font-size: 3rem;
+  line-height: 1.2;
+  margin-top: 40px;
+}
+
+.hero-section p {
+  font-size: 1.1rem;
+  max-width: 520px;
+}
+
+
+
+/* BUTTONS */
+.btn-success {
+  background-color: #2e7d32;
+  border: none;
+  box-shadow: 0 6px 15px rgba(46, 125, 50, 0.25);
+}
+
+.btn-success:hover {
+  background-color: #256528;
+  transform: translateY(-1px);
+}
+
+.btn-outline-success {
+  border-width: 2px;
+}
+
+/* FEATURES SECTION */
+.features-section {
+  background-color: #ffffff;
+  padding: 140px 0 80px; 
+}
+
+
+
+/* FEATURE CARD */
+.feature-card {
+  background: #f4f8f3;
+  padding: 30px 20px;
+  border-radius: 18px;
+  height: 100%;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 45px rgba(0,0,0,0.12);
+}
+
+/* ICON */
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+section {
+  position: relative;
+  z-index: 1;
+}
