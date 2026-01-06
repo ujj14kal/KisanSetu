@@ -16,7 +16,7 @@ body {
       rgba(244, 248, 243, 0.92),
       rgba(244, 248, 243, 0.92)
     ),
-    url("Assets/Images/Farming.png");
+    url("Assets/Images/Farm.webp");
   background-size: cover;
   background-position: center;
 }
@@ -81,6 +81,14 @@ body {
   font-size: 2rem;
   margin-bottom: 15px;
 }
+
+/* HERO RIGHT IMAGE ONLY */
+.hero-right-image {
+  max-width: 100%;
+  height: auto;
+  opacity: 0.8; 
+}
+
 
 section {
   position: relative;
