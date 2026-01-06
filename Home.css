@@ -16,7 +16,7 @@ body {
       rgba(244, 248, 243, 0.92),
       rgba(244, 248, 243, 0.92)
     ),
-    url("../Assets/Images/Farming.png");
+    url("Assets/Images/Farming.png");
   background-size: cover;
   background-position: center;
 }
