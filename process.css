@@ -1,0 +1,71 @@
+/* HERO */
+.process-hero {
+  padding: 140px 0 60px;
+  background-color: #f4f8f3;
+  text-align: center;
+}
+
+/* MAIN SECTIONS */
+.process-section {
+  padding: 80px 0;
+}
+
+/* SECTION TITLES */
+.section-title {
+  color: #2e7d32;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* SECTION INTRO TEXT */
+.section-intro {
+  color: #555;
+  max-width: 820px;
+  margin: 0 auto 40px;
+  text-align: center;
+  line-height: 1.7;
+}
+
+/* PROCESS STEPS */
+.process-step {
+  max-width: 900px;
+  margin: 0 auto 40px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+/* STEP HEADINGS */
+.process-step h5 {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+/* STEP PARAGRAPHS */
+.process-step p {
+  color: #555;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+/* DIVIDER BETWEEN FARMER & WORKER SECTIONS */
+.section-divider {
+  border: none;
+  height: 1px;
+  background-color: #e0e6e2;
+  margin: 0;
+}
+
+/* SUBTLE SEPARATOR BETWEEN STEPS */
+.process-step:not(:last-child)::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 2px;
+  background-color: #2e7d32;
+  margin: 25px auto 0;
+  opacity: 0.2;
+}
+
