@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Farmer Login | Kisan Setu</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml;utf8,
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+    <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='90'>🌾</text>
+  </svg>">
+
+  <!-- Common Styles -->
+  <link rel="stylesheet" href="Home.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+  <div class="container">
+
+    <!-- Brand -->
+    <a class="navbar-brand fw-bold text-success" href="index.html">
+      🌾 Kisan Setu
+    </a>
+
+    <!-- Toggle (mobile) -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Right side links -->
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+
+        <li class="nav-item me-lg-3">
+          <a class="nav-link fw-semibold" href="index.html">Home</a>
+        </li>
+
+
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
+
+
+
+
+<!-- LOGIN SECTION -->
+<section class="auth-section auth-bg">
+  <div class="container d-flex justify-content-center">
+    
+    <div class="auth-card text-center">
+
+      <h2 class="auth-title fw-bold mb-2">Farmer Login</h2>
+
+      <p class="auth-subtitle mb-4">
+        Find verified farming jobs from trusted employers.
+      </p>
+
+      <form>
+        <label class="form-label d-block text-center mb-2">
+          Enter Mobile Number
+        </label>
+
+        <input
+          type="tel"
+          class="form-control mb-3"
+          placeholder="Enter 10-digit mobile number"
+          required
+        >
+
+        <button type="submit" class="btn btn-success w-100">
+          Get OTP
+        </button>
+      </form>
+
+      <p class="auth-footer-text mt-3">
+        Don’t have an account?
+        <a href="#" class="fw-semibold">Create Farmer Account</a>
+      </p>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- PRE-FOOTER -->
+<section class="pre-footer">
+  <div class="container">
+    <div class="row justify-content-center">
+
+      <!-- shifted right using offset -->
+      <div class="col-md-3 offset-md-1 text-center text-md-start">
+        <ul class="list-unstyled">
+          <li><a href="#">About Kisan Setu</a></li>
+          <li><a href="#">How It Works</a></li>
+          <li><a href="#">Support</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-3 text-center text-md-start">
+        <ul class="list-unstyled">
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container footer-content">
+    <p class="footer-text">© 2026 Kisan Setu. All rights reserved.</p>
+    <p class="footer-brand">🌾 <strong>Kisan Setu</strong></p>
+  </div>
+</footer>
+
+</body>
+</html>

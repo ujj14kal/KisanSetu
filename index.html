@@ -28,11 +28,34 @@
 
       <div class="collapse navbar-collapse" id="nav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" href="#">Support</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Process</a></li>
-          <li class="nav-item">
-            <a class="btn btn-success ms-lg-3 px-4" href="#">Login</a>
-          </li>
+          <li class="nav-item"><a class="nav-link active" href="support.html">Support</a></li>
+          <li class="nav-item"><a class="nav-link" href="process.html">Process</a></li>
+          <li class="nav-item dropdown ms-lg-3">
+  <a
+    class="btn btn-success px-4 dropdown-toggle"
+    href="#"
+    id="loginDropdown"
+    role="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    Login
+  </a>
+
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li>
+      <a class="dropdown-item" href="login-farmer.html">
+        🌾 Login as Farmer
+      </a>
+    </li>
+    <li>
+      <a class="dropdown-item" href="login-worker.html">
+        👩‍🌾 Login as Worker
+      </a>
+    </li>
+  </ul>
+</li>
+
         </ul>
       </div>
     </div>
@@ -51,8 +74,8 @@
             Farmers can find verified agricultural workers, and workers can find trusted, verified employers — all on Kisan Setu.
           </p>
 
-          <a href="#" class="btn btn-success px-4 me-3">I am a Farmer</a>
-          <a href="#" class="btn btn-outline-success px-4">I am a Worker</a>
+          <a href="login-farmer.html" class="btn btn-success px-4 me-3">I am a Farmer</a>
+          <a href="login-worker.html" class="btn btn-outline-success px-4">I am a Worker</a>
         </div>
 
         <div class="col-md-6 text-center d-none d-md-block">
