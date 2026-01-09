@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Worker Account | Kisan Setu</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='90'%3E🌾%3C/text%3E%3C/svg%3E">
+
+  <!-- Common Styles -->
+  <link rel="stylesheet" href="Home.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-success" href="index.html">🌾 Kisan Setu</a>
+  </div>
+</nav>
+
+<!-- CREATE ACCOUNT SECTION -->
+<section class="auth-section auth-bg">
+  <div class="container d-flex justify-content-center">
+
+    <div class="auth-card">
+
+      <h2 class="fw-bold text-center mb-2">Create Worker Account</h2>
+      <p class="text-muted text-center mb-4">
+        Complete your profile to get hired by verified employers
+      </p>
+
+      <!-- FORM -->
+      <form id="workerForm" novalidate>
+
+        <!-- MOBILE VERIFICATION -->
+        <h6 class="mb-3">Mobile Verification</h6>
+
+        <div class="mb-3">
+          <label class="form-label">Mobile Number</label>
+          <div class="input-group">
+            <input type="tel" class="form-control" id="mobile" placeholder="Enter 10-digit mobile number" required>
+            <button type="button" class="btn btn-outline-success">Send OTP</button>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Enter OTP</label>
+          <input type="text" class="form-control" placeholder="Enter OTP received" required>
+        </div>
+
+        <!-- PERSONAL DETAILS -->
+        <h6 class="mb-3 mt-4">Personal Details</h6>
+
+        <div class="mb-3">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="name" placeholder="Enter full name" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Age</label>
+          <input type="number" class="form-control" id="age" placeholder="Enter age" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Location</label>
+          <input type="text" class="form-control" id="location" placeholder="Village, District, State" required>
+        </div>
+
+        <!-- WORK DETAILS -->
+        <h6 class="mb-3 mt-4">Work Details</h6>
+
+        <div class="mb-3">
+          <label class="form-label">Primary Type of Work</label>
+          <select class="form-select" id="work" required>
+            <option value="">Select work</option>
+            <option>Harvesting</option>
+            <option>Sowing</option>
+            <option>Irrigation</option>
+            <option>Ploughing</option>
+            <option>General Farm Labour</option>
+            <option>Machinery Operator</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Experience</label>
+          <select class="form-select" id="experience" required>
+            <option value="">Select experience</option>
+            <option>Less than 1 year</option>
+            <option>1–3 years</option>
+            <option>3–5 years</option>
+            <option>5+ years</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Availability</label>
+          <select class="form-select" id="availability" required>
+            <option value="">Select availability</option>
+            <option>Full-time</option>
+            <option>Part-time</option>
+            <option>Seasonal</option>
+          </select>
+        </div>
+
+        <!-- AADHAAR -->
+        <h6 class="mb-3 mt-4">Aadhaar Verification</h6>
+
+        <input type="text" class="form-control mb-3" placeholder="XXXX-XXXX-XXXX" required>
+        <input type="file" class="form-control mb-3" accept="image/*" required>
+        <input type="file" class="form-control mb-4" accept="image/*" required>
+
+        <!-- REVIEW BUTTON -->
+        <button type="button" class="btn btn-success w-100" onclick="validateAndPreview()">
+          Review Details
+        </button>
+
+      </form>
+
+      <!-- PREVIEW -->
+      <div id="previewSection" style="display:none;">
+        <h4 class="text-center mb-3">Review Your Details</h4>
+
+        <div class="bg-light p-3 rounded mb-3">
+          <p><strong>Mobile:</strong> <span id="pMobile"></span></p>
+          <p><strong>Name:</strong> <span id="pName"></span></p>
+          <p><strong>Age:</strong> <span id="pAge"></span></p>
+          <p><strong>Location:</strong> <span id="pLocation"></span></p>
+          <p><strong>Work:</strong> <span id="pWork"></span></p>
+          <p><strong>Experience:</strong> <span id="pExperience"></span></p>
+          <p><strong>Availability:</strong> <span id="pAvailability"></span></p>
+          <p><strong>Aadhaar:</strong> Uploaded (Front & Back)</p>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary w-50" onclick="editForm()">Edit</button>
+          <button class="btn btn-success w-50" onclick="finalSubmit()">Confirm & Submit</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container footer-content">
+    <p class="footer-text">© 2026 Kisan Setu. All rights reserved.</p>
+    <p class="footer-brand">🌾 <strong>Kisan Setu</strong></p>
+  </div>
+</footer>
+
+<script>
+function validateAndPreview() {
+  const form = document.getElementById("workerForm");
+
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  showPreview();
+}
+
+function showPreview() {
+  pMobile.innerText = mobile.value;
+  pName.innerText = name.value;
+  pAge.innerText = age.value;
+  pLocation.innerText = location.value;
+  pWork.innerText = work.value;
+  pExperience.innerText = experience.value;
+  pAvailability.innerText = availability.value;
+
+  workerForm.style.display = "none";
+  previewSection.style.display = "block";
+}
+
+function editForm() {
+  previewSection.style.display = "none";
+  workerForm.style.display = "block";
+}
+
+function finalSubmit() {
+  alert("Profile submitted successfully!");
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+

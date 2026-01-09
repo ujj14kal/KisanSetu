@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Farmers | Kisan Setu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <link rel="stylesheet" href="Home.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-success" href="index.html">🌾 Kisan Setu</a>
+    <button class="btn btn-outline-success" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<section class="auth-section auth-bg">
+  <div class="container">
+    <div class="auth-card">
+      <h4 class="fw-bold text-center mb-3">Search Farmers</h4>
+      <div class="input-group mb-4">
+        <input type="text" id="locationInput" class="form-control" placeholder="Enter location (e.g. delhi)">
+        <button class="btn btn-success" onclick="searchFarmers()">Search</button>
+      </div>
+
+      <div id="subscriptionWarning" class="alert alert-warning text-center d-none shadow-sm">
+        <strong>Subscription Inactive:</strong> You need an active subscription to send hiring requests. 
+        <button class="btn btn-sm btn-success ms-2" onclick="handlePayment()">Pay ₹20 Now</button>
+      </div>
+
+      <div id="results"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const { createClient } = supabase;
+  const supabaseClient = createClient(
+    "https://kyujketzdhkbykybjywu.supabase.co",
+    "sb_publishable_L4o-HFt5rMGfY5x_UKPVZw_xNVMf59b"
+  );
+
+  async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.replace("index.html"); return; }
+
+    const { data: profile, error } = await supabaseClient
+      .from("profiles")
+      .select("role, subscription_active")
+      .eq("id", session.user.id)
+      .maybeSingle();
+
+    if (error || !profile || profile.role !== "worker") {
+      window.location.replace("index.html");
+      return;
+    }
+
+    const warning = document.getElementById("subscriptionWarning");
+    if (!profile.subscription_active) {
+      warning.classList.remove("d-none");
+    } else {
+      warning.classList.add("d-none");
+    }
+  }
+
+  async function searchFarmers() {
+    const locationStr = document.getElementById("locationInput").value.trim();
+    const resultsDiv = document.getElementById("results");
+    if (!locationStr) { resultsDiv.innerHTML = ""; return; }
+
+    resultsDiv.innerHTML = '<div class="text-center my-3"><div class="spinner-border text-success"></div></div>';
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("subscription_active")
+      .eq("id", session.user.id)
+      .single();
+
+    const isSubscribed = profile ? profile.subscription_active : false;
+
+    const { data: farmers, error } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("role", "farmer")
+      .ilike("location", `%${locationStr}%`);
+
+    resultsDiv.innerHTML = "";
+    if (error || farmers.length === 0) {
+      resultsDiv.innerHTML = `<p class="text-muted text-center">No farmers found.</p>`;
+      return;
+    }
+
+    farmers.forEach(farmer => {
+      if (isSubscribed) {
+        resultsDiv.innerHTML += `
+          <div class="border rounded p-3 mb-3 bg-white shadow-sm text-start">
+            <h6 class="fw-bold mb-0 text-success">${farmer.full_name}</h6>
+            <p class="mb-0 text-muted small mt-1">${farmer.location}</p>
+            <button class="btn btn-success btn-sm w-100 mt-3"
+              onclick="hireFarmer('${farmer.id}', '${farmer.location}')">
+              Send Hiring Request
+            </button>
+          </div>`;
+      } else {
+        resultsDiv.innerHTML += `
+          <div class="border rounded p-3 mb-3 bg-white shadow-sm text-start">
+            <h6 class="fw-bold mb-0 text-success">${farmer.full_name}</h6>
+            <div class="mt-3 p-3 border-top bg-light rounded text-center">
+              <p class="text-danger small mb-2">Details Locked</p>
+              <button class="btn btn-sm btn-success" onclick="handlePayment()">
+                Unlock with Subscription
+              </button>
+            </div>
+          </div>`;
+      }
+    });
+  }
+
+  async function handlePayment() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    const options = {
+      key: "rzp_test_S1PAt6cRY4BTfV",
+      amount: 2000,
+      currency: "INR",
+      name: "Kisan Setu",
+      description: "Worker Subscription",
+
+      notes: {
+        user_id: session.user.id   // ✅ REQUIRED FOR WEBHOOK
+      },
+
+      prefill: {
+        email: session.user.email
+      },
+
+      handler: function (response) {
+        alert("Payment Successful! ID: " + response.razorpay_payment_id);
+        setTimeout(() => {
+          window.location.href = "profile-worker.html";
+        }, 2000);
+      },
+
+      theme: { color: "#198754" }
+    };
+
+    const rzp1 = new Razorpay(options);
+    rzp1.open();
+  }
+
+  async function hireFarmer(farmerId, farmerLocation) {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const { error } = await supabaseClient
+      .from("jobs")
+      .insert([{
+        worker_id: session.user.id,
+        farmer_id: farmerId,
+        status: "pending",
+        location: farmerLocation || "Location Not Specified"
+      }]);
+
+    if (error) alert(error.message);
+    else { alert("Request sent!"); window.location.href = "profile-worker.html"; }
+  }
+
+  async function logout() {
+    await supabaseClient.auth.signOut();
+    window.location.replace("index.html");
+  }
+
+  init();
+</script>
+
+</body>
+</html>

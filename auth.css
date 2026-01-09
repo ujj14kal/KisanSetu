@@ -1,11 +1,49 @@
 /* AUTH SECTION */
 .auth-section {
+  box-sizing: border-box;
+  min-height: 100vh;
   padding: 140px 0 100px;
-  background: linear-gradient(135deg, #e8f5e9, #f4f8f3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* AUTH SECTION BACKGROUND */
+.auth-bg {
+  min-height: 100vh;
+  position: relative;
+  background:
+    linear-gradient(
+      rgba(245, 252, 245, 0.6),
+      rgba(245, 252, 245, 0.9)
+    ),
+    url("Assets/Images/farmer-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.03),
+    rgba(0, 0, 0, 0.10)
+  );
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* CARD */
 .auth-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
   max-width: 420px;
   margin: auto;
   background: #fff;
@@ -19,6 +57,7 @@
 .auth-title {
   color: #2e7d32;
   margin-bottom: 8px;
+  font-weight: 600;
 }
 
 .auth-subtitle {
@@ -41,6 +80,7 @@ input {
   margin: 8px 0 18px;
   border-radius: 10px;
   border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
 input:focus {
@@ -60,9 +100,14 @@ input:focus {
   font-weight: 500;
 }
 
+/* PRE-FOOTER */
 .pre-footer {
   background-color: #ffffff;
   padding: 50px 0 30px;
+  margin-top: auto; 
+  width: 100%;
+  position: relative;
+  z-index: 2;
 }
 
 .pre-footer ul li {
@@ -79,32 +124,51 @@ input:focus {
   color: #2e7d32;
 }
 
-/* AUTH SECTION BACKGROUND (COMMON FOR FARMER + WORKER) */
-.auth-bg {
-  min-height: 80vh;
-  position: relative;
-  background:
-    linear-gradient(
-      rgba(245, 252, 245, 0.6),
-      rgba(245, 252, 245, 0.9)
-    ),
-    url("Assets/Images/farmer-bg.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+/* CREATE ACCOUNT SPECIFICS */
+.auth-card h6 {
+  font-weight: 600;
+  color: #2e7d32;
+  margin-top: 10px;
 }
 
-.auth-bg::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 0, 0, 0.03),
-    rgba(0, 0, 0, 0.10)
-  );
-  pointer-events: none;
-  z-index: 1;
+.auth-card .form-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
 }
 
+.auth-card .form-control,
+.auth-card .form-select {
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.auth-card .form-control:focus,
+.auth-card .form-select:focus {
+  border-color: #2e7d32;
+  box-shadow: none;
+}
+
+.auth-card input[type="file"] {
+  padding: 6px;
+  font-size: 0.9rem;
+}
+
+.auth-card small {
+  font-size: 0.8rem;
+}
+
+.auth-card button {
+  margin-top: 10px;
+}
+
+/* MOBILE */
+@media (max-width: 576px) {
+  .auth-section {
+    padding: 80px 15px 60px;
+  }
+  .auth-card {
+    padding: 28px 22px;
+  }
+}
 
