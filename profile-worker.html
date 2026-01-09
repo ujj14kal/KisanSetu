@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Worker Profile | Kisan Setu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="Home.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-success" href="index.html">🌾 Kisan Setu</a>
+    <button class="btn btn-outline-success" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<section class="auth-section auth-bg">
+  <div class="container">
+    <div class="auth-card">
+      <h3 class="fw-bold text-center mb-2" id="workerName">Loading...</h3>
+      <p class="text-muted text-center mb-3" id="workerLocation"></p>
+
+      <div class="row text-center mb-4">
+        <div class="col-6">
+          <p class="fw-semibold mb-1">Aadhaar Status</p>
+          <span id="aadhaarStatus" class="badge bg-warning">Pending</span>
+        </div>
+        <div class="col-6">
+          <p class="fw-semibold mb-1">Subscription</p>
+          <span id="subscriptionStatus" class="badge bg-danger">Inactive</span>
+        </div>
+      </div>
+
+      <button id="subscribeBtn" class="btn btn-success w-100 mb-3" style="display:none;" onclick="subscribe()">
+        Subscribe ₹20 / month
+      </button>
+
+      <a id="searchFarmersBtn" href="search-farmers.html" class="btn btn-success w-100 mb-3" style="display:none;">
+        Search Farmers
+      </a>
+
+      <hr>
+      <h5 class="fw-bold mb-3">Dashboard</h5>
+
+      <div class="mb-3">
+        <p class="fw-semibold mb-1">My Hiring Requests</p>
+        <div id="myRequests">
+          <div class="text-center p-2">
+            <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <p class="fw-semibold mb-1">Work History</p>
+        <p class="text-muted">No previous records</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const { createClient } = supabase;
+  const supabaseClient = createClient(
+    "https://kyujketzdhkbykybjywu.supabase.co",
+    "sb_publishable_L4o-HFt5rMGfY5x_UKPVZw_xNVMf59b"
+  );
+
+  async function loadProfile() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) { window.location.href = "login-worker.html"; return; }
+
+    const { data: profile, error } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (error || !profile) { window.location.href = "create-account-worker.html"; return; }
+
+    document.getElementById("workerName").innerText = profile.full_name;
+    document.getElementById("workerLocation").innerText = profile.location || "";
+
+    document.getElementById("aadhaarStatus").innerText = profile.aadhar_verified ? "Verified" : "Pending";
+    document.getElementById("aadhaarStatus").className = profile.aadhar_verified ? "badge bg-success" : "badge bg-warning";
+
+    if (profile.subscription_active) {
+      document.getElementById("subscriptionStatus").innerText = "Active";
+      document.getElementById("subscriptionStatus").className = "badge bg-success";
+      document.getElementById("searchFarmersBtn").style.display = "block";
+      document.getElementById("subscribeBtn").style.display = "none";
+    } else {
+      document.getElementById("subscriptionStatus").innerText = "Inactive";
+      document.getElementById("subscriptionStatus").className = "badge bg-danger";
+      document.getElementById("searchFarmersBtn").style.display = "none";
+      document.getElementById("subscribeBtn").style.display = "block";
+    }
+
+    loadMyRequests(user.id);
+    subscribeToUpdates(user.id);
+  }
+
+  function subscribeToUpdates(workerId) {
+    supabaseClient
+      .channel('worker-dash-updates')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'jobs', filter: `worker_id=eq.${workerId}` },
+        () => loadMyRequests(workerId)
+      )
+      .subscribe();
+  }
+
+  async function loadMyRequests(workerId) {
+    const requestsDiv = document.getElementById("myRequests");
+    const { data: jobs, error } = await supabaseClient
+      .from('jobs')
+      .select(`
+        id, 
+        status, 
+        profiles!jobs_farmer_id_fkey (full_name, location)
+      `)
+      .eq('worker_id', workerId)
+      .order('created_at', { ascending: false });
+
+    if (error) { 
+      requestsDiv.innerHTML = `<p class="text-danger small">Error loading requests</p>`; 
+      return; 
+    }
+
+    if (!jobs || jobs.length === 0) { 
+      requestsDiv.innerHTML = `<p class="text-muted small">No active requests.</p>`; 
+      return; 
+    }
+
+    requestsDiv.innerHTML = "";
+    jobs.forEach(job => {
+      let statusClass = "bg-warning text-dark";
+      if (job.status === 'accepted') statusClass = "bg-success";
+      if (job.status === 'declined') statusClass = "bg-danger";
+
+      const farmer = job.profiles;
+      requestsDiv.innerHTML += `
+        <div class="border rounded p-2 mb-2 bg-light d-flex justify-content-between align-items-center shadow-sm">
+          <div>
+            <p class="mb-0 fw-bold small text-success">${farmer ? farmer.full_name : 'Farmer'}</p>
+            <p class="mb-0 text-muted" style="font-size: 0.7rem;">${farmer ? (farmer.location || 'Location N/A') : ''}</p>
+          </div>
+          <span class="badge ${statusClass}" style="font-size: 0.7rem;">${job.status.toUpperCase()}</span>
+        </div>`;
+    });
+  }
+
+  async function subscribe() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return;
+
+    // Use window.location.href instead of window.open to prevent popup blockers
+    // Ensure the ID 'YqESE7Er' is exactly as shown in your Razorpay Dashboard (Case Sensitive)
+    const baseUrl = "https://rzp.io/rzp/ckC2BWRQ";
+    const email = encodeURIComponent(user.email);
+    const finalUrl = `${baseUrl}?email=${email}`;
+    
+    window.location.href = finalUrl;
+  }
+
+  async function logout() { await supabaseClient.auth.signOut(); window.location.href = "index.html"; }
+  loadProfile();
+</script>
+</body>
+</html>
+
