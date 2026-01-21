@@ -30,26 +30,18 @@
 <div class="modal fade" id="roleModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content rounded-4 p-3">
-
       <div class="modal-body text-center">
         <h4 class="fw-bold mb-2">Welcome to Kisan Setu 🌾</h4>
-        <p class="text-muted mb-4">
-          Tell us who you are to continue
-        </p>
+        <p class="text-muted mb-4">Tell us who you are to continue</p>
 
-        <button
-          class="btn btn-success w-100 mb-3"
-          onclick="goFarmer()">
+        <button class="btn btn-success w-100 mb-3" onclick="goFarmer()">
           I am a Farmer
         </button>
 
-        <button
-          class="btn btn-outline-success w-100"
-          onclick="goWorker()">
+        <button class="btn btn-outline-success w-100" onclick="goWorker()">
           I am a Worker
         </button>
       </div>
-
     </div>
   </div>
 </div>
@@ -62,69 +54,89 @@
     "sb_publishable_L4o-HFt5rMGfY5x_UKPVZw_xNVMf59b"
   );
 
+  let redirectHandled = false;
+
   async function redirectByRole(user) {
-    // maybeSingle() is safer as it returns null instead of an error if no row is found
     const { data: profile, error } = await supabaseClient
       .from("profiles")
-      .select("role")
+      .select("role, profile_completed")
       .eq("id", user.id)
       .maybeSingle();
 
-    if (error) {
-      console.error("Policy/Database Error:", error.message);
+    if (error || !profile) {
       showRoleModal();
       return;
     }
 
-    if (profile && profile.role === "farmer") {
+    if (!profile.profile_completed) {
+      if (profile.role === "farmer") {
+        window.location.replace("create-account-farmer.html");
+      } else {
+        window.location.replace("create-account-worker.html");
+      }
+      return;
+    }
+
+    if (profile.role === "farmer") {
       window.location.replace("profile-farmer.html");
-    } else if (profile && profile.role === "worker") {
-      window.location.replace("profile-worker.html");
     } else {
-      // No profile found in 'profiles' table yet
-      showRoleModal();
+      window.location.replace("profile-worker.html");
     }
   }
 
   function showRoleModal() {
-    const modalElement = document.getElementById("roleModal");
-    const modal = new bootstrap.Modal(modalElement);
+    const modal = new bootstrap.Modal(document.getElementById("roleModal"));
     modal.show();
   }
 
-  // Monitor Auth State
   supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (redirectHandled) return;
     if (session?.user) {
+      redirectHandled = true;
       await redirectByRole(session.user);
     }
   });
 
-  // These functions save the role to Supabase so the modal doesn't show next time
   async function goFarmer() {
     const { data: { user } } = await supabaseClient.auth.getUser();
+
     const { error } = await supabaseClient
-      .from('profiles')
-      .upsert({ id: user.id, role: 'farmer' });
-    
-    if (!error) window.location.replace("farmer-profile.html");
-    else console.error("Update failed:", error.message);
+      .from("profiles")
+      .upsert({
+        id: user.id,
+        role: "farmer",
+        profile_completed: false
+      });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    window.location.replace("create-account-farmer.html");
   }
 
   async function goWorker() {
     const { data: { user } } = await supabaseClient.auth.getUser();
-    const { error } = await supabaseClient
-      .from('profiles')
-      .upsert({ id: user.id, role: 'worker' });
 
-    if (!error) window.location.replace("worker-profile.html");
-    else console.error("Update failed:", error.message);
+    const { error } = await supabaseClient
+      .from("profiles")
+      .upsert({
+        id: user.id,
+        role: "worker",
+        profile_completed: false
+      });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    window.location.replace("create-account-worker.html");
   }
 </script>
-
-
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
