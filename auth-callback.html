@@ -17,7 +17,6 @@
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
 <section class="auth-section auth-bg d-flex align-items-center justify-content-center">
   <div class="auth-card text-center">
     <h4 class="fw-bold mb-2">Signing you in…</h4>
@@ -49,28 +48,58 @@
 <script>
   const { createClient } = supabase;
 
+  // ✅ FIX 1: USE ANON PUBLIC JWT KEY (NOT publishable key)
   const supabaseClient = createClient(
     "https://kyujketzdhkbykybjywu.supabase.co",
-    "sb_publishable_L4o-HFt5rMGfY5x_UKPVZw_xNVMf59b"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA"
   );
 
   let redirectHandled = false;
 
+  async function handleAuth() {
+    // ✅ FIX 2: Handle OAuth callback (Google login)
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if (code) {
+      const { error } = await supabaseClient.auth.exchangeCodeForSession(
+        window.location.href
+      );
+
+      if (error) {
+        alert("Login failed");
+        return;
+      }
+    }
+
+    // Works for BOTH username & Google login
+    const { data } = await supabaseClient.auth.getSession();
+
+    if (data.session?.user) {
+      redirectHandled = true;
+      await redirectByRole(data.session.user);
+    }
+  }
+
   async function redirectByRole(user) {
-    const { data: profile, error } = await supabaseClient
+    const { data: profile } = await supabaseClient
       .from("profiles")
       .select("role, full_name")
       .eq("id", user.id)
       .maybeSingle();
 
-    // No row yet → choose role
-    if (error || !profile) {
+    // No profile yet → choose role
+    if (!profile) {
       showRoleModal();
       return;
     }
 
-    // Role exists but profile NOT created
-    if (!profile.full_name) {
+    const onboardingComplete =
+      profile.role &&
+      profile.full_name;
+
+    // Profile exists but onboarding incomplete
+    if (!onboardingComplete) {
       if (profile.role === "farmer") {
         window.location.replace("create-account-farmer.html");
       } else {
@@ -79,7 +108,7 @@
       return;
     }
 
-    // Profile complete → dashboard
+    // Onboarding complete → dashboard
     if (profile.role === "farmer") {
       window.location.replace("profile-farmer.html");
     } else {
@@ -92,23 +121,13 @@
     modal.show();
   }
 
-  supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    if (redirectHandled) return;
-    if (session?.user) {
-      redirectHandled = true;
-      await redirectByRole(session.user);
-    }
-  });
-
   async function goFarmer() {
     const { data: { user } } = await supabaseClient.auth.getUser();
 
     const { error } = await supabaseClient
       .from("profiles")
-      .upsert({
-        id: user.id,
-        role: "farmer"
-      });
+      .update({ role: "farmer" })
+      .eq("id", user.id);
 
     if (error) {
       alert(error.message);
@@ -123,10 +142,8 @@
 
     const { error } = await supabaseClient
       .from("profiles")
-      .upsert({
-        id: user.id,
-        role: "worker"
-      });
+      .update({ role: "worker" })
+      .eq("id", user.id);
 
     if (error) {
       alert(error.message);
@@ -135,10 +152,14 @@
 
     window.location.replace("create-account-worker.html");
   }
-</script>
 
+  // 🚀 Start auth handling
+  handleAuth();
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
 
