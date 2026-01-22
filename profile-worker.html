@@ -94,27 +94,42 @@
   let currentUser = null;
 
   async function loadProfile() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) return location.href = "login-worker.html";
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session?.user) {
+      location.href = "login-worker.html";
+      return;
+    }
 
-    currentUser = user;
+    currentUser = session.user;
 
     const { data: profile, error } = await supabaseClient
       .from("profiles")
-      .select("*")
-      .eq("id", user.id)
+      .select(`
+        full_name,
+        role,
+        location,
+        skill,
+        crops,
+        availability,
+        aadhar_verified,
+        subscription_active
+      `)
+      .eq("id", currentUser.id)
       .single();
 
-    if (error || !profile) return location.href = "login-worker.html";
+    if (error || !profile) {
+      location.href = "login-worker.html";
+      return;
+    }
 
-    // Worker-only guard
+    // 🔐 Worker-only guard
     if (profile.role !== "worker") {
       location.href = "profile-farmer.html";
       return;
     }
 
     document.getElementById("workerName").innerText = profile.full_name;
-    document.getElementById("workerLocation").innerText = profile.location;
+    document.getElementById("workerLocation").innerText = profile.location || "";
     document.getElementById("skill").innerText = profile.skill || "—";
     document.getElementById("crops").innerText = profile.crops || "—";
     document.getElementById("availability").innerText = profile.availability || "—";
@@ -142,7 +157,7 @@
       searchBtn.classList.add("d-none");
     }
 
-    fetchSentRequests(profile.id);
+    fetchSentRequests(currentUser.id);
   }
 
   async function fetchSentRequests(workerId) {
@@ -166,7 +181,7 @@
       return;
     }
 
-    if (!data.length) {
+    if (!data || data.length === 0) {
       container.innerHTML = `<p class="text-muted small text-center">No requests sent yet.</p>`;
       return;
     }
@@ -175,8 +190,8 @@
     data.forEach(job => {
       container.innerHTML += `
         <div class="border rounded p-3 mb-2 bg-white shadow-sm">
-          <h6 class="fw-bold text-success">${job.farmer.full_name}</h6>
-          <p class="text-muted small mb-1">${job.farmer.location || "Location N/A"}</p>
+          <h6 class="fw-bold text-success">${job.farmer?.full_name}</h6>
+          <p class="text-muted small mb-1">${job.farmer?.location || "Location N/A"}</p>
           <span class="badge ${getStatusClass(job.status)}">
             ${job.status.toUpperCase()}
           </span>
@@ -217,8 +232,18 @@
   loadProfile();
 </script>
 
+<script>
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (!session) {
+      window.location.replace("index.html");
+    }
+  });
+</script>
+
+
 </body>
 </html>
+
 
 
 

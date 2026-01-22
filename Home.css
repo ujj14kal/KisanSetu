@@ -313,6 +313,10 @@ body {
   margin-top: 0;
 }
 
+.nav-item:hover .nav-link {
+  color: #256528;
+} 
+
 /* CLEAN DROPDOWN LOOK */
 .dropdown-menu {
   border-radius: 12px;

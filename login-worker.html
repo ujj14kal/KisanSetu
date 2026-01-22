@@ -26,37 +26,51 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
   <div class="container">
     <a class="navbar-brand fw-bold text-success" href="index.html">🌾 Kisan Setu</a>
+    <ul class="navbar-nav ms-auto">
+      <li class="nav-item">
+        <a class="nav-link active" href="login-farmer.html">Farmer Login</a>
+      </li>
+    </ul>
   </div>
 </nav>
 
-<!-- LOGIN SECTION -->
 <section class="auth-section auth-bg">
   <div class="container d-flex justify-content-center">
-    
     <div class="auth-card text-center">
 
       <h2 class="auth-title fw-bold mb-2">Worker Login</h2>
+      <p class="auth-subtitle mb-4">Find trusted farming work near you</p>
 
-      <p class="auth-subtitle mb-4">
-        Find trusted farming work near you
-      </p>
+      <div class="mb-3">
+        <input type="text" class="form-control" id="username" placeholder="Username" required />
+      </div>
 
-      <!-- GOOGLE LOGIN -->
-      <button onclick="loginWithGoogle()" class="btn btn-success w-100 mb-3">
-        Continue with Google
+      <div class="mb-3">
+        <input type="password" class="form-control" id="password" placeholder="Password" required />
+      </div>
+
+      <button class="btn btn-success w-100 mb-3" onclick="loginWithUsername()">
+        Login
+      </button>
+
+      <div class="text-muted my-3">OR</div>
+
+      <button onclick="loginWithGoogle()" class="google-btn w-100 mb-3">
+        <img src="Assets/Images/google_logo_no_bg.png" alt="Google" class="google-icon" />
+        <span>Continue with Google</span>
       </button>
 
       <p class="auth-footer-text mt-3">
         Don’t have an account?
-        <a href="create-account-worker.html" class="fw-semibold">Create Worker Account</a>
+        <a href="create-account-worker.html" class="fw-semibold">
+          Create Worker Account
+        </a>
       </p>
 
     </div>
-
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer class="site-footer">
   <div class="container footer-content">
     <p class="footer-text">© 2026 Kisan Setu. All rights reserved.</p>
@@ -65,29 +79,65 @@
 </footer>
 
 <script>
-  // ✅ Correct way for Supabase v2 CDN
   const { createClient } = supabase;
 
+  // ✅ FIX 1: Use ANON PUBLIC KEY (JWT)
   const supabaseClient = createClient(
     "https://kyujketzdhkbykybjywu.supabase.co",
-    "sb_publishable_L4o-HFt5rMGfY5x_UKPVZw_xNVMf59b"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA"
   );
 
   async function loginWithGoogle() {
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + "/auth-callback.html"
+        redirectTo: window.location.origin + "auth-callback.html"
       }
     });
 
-    if (error) {
-      alert(error.message);
+    if (error) alert(error.message);
+  }
+
+  async function loginWithUsername() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+      alert("Enter username and password");
+      return;
     }
+
+    const response = await fetch(
+      "https://kyujketzdhkbykybjywu.supabase.co/functions/v1/login-with-username",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": supabaseClient.supabaseKey,
+          "Authorization": `Bearer ${supabaseClient.supabaseKey}`
+        },
+        body: JSON.stringify({ username, password, expectedRole: "worker" })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      alert(result.error || "Login failed");
+      return;
+    }
+
+    await supabaseClient.auth.setSession(result.session);
+    window.location.href = "auth-callback.html";
   }
 </script>
 
-
 </body>
 </html>
+
+
+
+
+
+
 

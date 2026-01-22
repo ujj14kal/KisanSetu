@@ -74,17 +74,27 @@
   let currentFarmerId = null;
 
   async function loadProfile() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { data: { session } } = await supabaseClient.auth.getSession();
 
-    if (!user || !user.id) {
+    if (!session?.user) {
       window.location.href = "login-farmer.html";
       return;
     }
 
+    const userId = session.user.id;
+
     const { data: profile, error } = await supabaseClient
       .from("profiles")
-      .select("*")
-      .eq("id", user.id)
+      .select(`
+        full_name,
+        role,
+        location,
+        skill,
+        crops,
+        availability,
+        aadhar_verified
+      `)
+      .eq("id", userId)
       .single();
 
     if (error || !profile) {
@@ -92,16 +102,16 @@
       return;
     }
 
-    /* 🔐 ROLE GUARD — FINAL FIX */
+    /* 🔐 ROLE GUARD */
     if (profile.role !== "farmer") {
       window.location.href = "profile-worker.html";
       return;
     }
 
-    currentFarmerId = user.id;
+    currentFarmerId = userId;
 
     document.getElementById("farmerName").innerText = profile.full_name;
-    document.getElementById("farmerLocation").innerText = profile.location;
+    document.getElementById("farmerLocation").innerText = profile.location || "";
     document.getElementById("skill").innerText = profile.skill || "—";
     document.getElementById("crops").innerText = profile.crops || "—";
     document.getElementById("availability").innerText = profile.availability || "—";
@@ -217,11 +227,21 @@
   loadProfile();
 </script>
 
+<script>
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (!session) {
+      window.location.replace("index.html");
+    }
+  });
+</script>
+
+
 <style>
   .extra-small { font-size: 0.75rem; }
 </style>
 
 </body>
 </html>
+
 
 
