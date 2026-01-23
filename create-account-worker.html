@@ -15,7 +15,6 @@
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='90'%3E🌾%3C/text%3E%3C/svg%3E">
 
-  <!-- Common Styles -->
   <link rel="stylesheet" href="Home.css">
   <link rel="stylesheet" href="auth.css">
 </head>
@@ -29,7 +28,6 @@
 
 <section class="auth-section auth-bg">
   <div class="container d-flex justify-content-center">
-
     <div class="auth-card">
 
       <h2 class="fw-bold text-center mb-2">Create Worker Account</h2>
@@ -39,7 +37,7 @@
 
       <form id="workerForm" novalidate>
 
-        <h6 class="mb-3">Mobile Verification</h6>
+        <h6 class="mb-3">Contact Details</h6>
 
         <div class="mb-3">
           <label class="form-label">Mobile Number</label>
@@ -53,12 +51,13 @@
 
         <h6 class="mb-3 mt-4">Login Credentials</h6>
 
-        <div class="mb-3">
+        <div class="mb-1">
           <label class="form-label">Username</label>
-          <input type="text" class="form-control" id="username" required>
+          <input type="text" class="form-control" id="username" required onblur="checkUsernameAvailability()">
+          <small id="usernameStatus" class="d-block mt-1"></small>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3 mt-3">
           <label class="form-label">Password</label>
           <input type="password" class="form-control" id="password" required>
         </div>
@@ -72,7 +71,7 @@
 
         <div class="mb-3">
           <label class="form-label">Age</label>
-          <input type="number" class="form-control" id="age" required>
+          <input type="number" class="form-control" id="age" min="18" required>
         </div>
 
         <div class="mb-3">
@@ -83,7 +82,7 @@
         <h6 class="mb-3 mt-4">Work Details</h6>
 
         <div class="mb-3">
-          <label class="form-label">Primary Type of Work</label>
+          <label class="form-label">Primary Work Type</label>
           <select class="form-select" id="work" required>
             <option value="">Select work</option>
             <option>Harvesting</option>
@@ -116,7 +115,7 @@
           </select>
         </div>
 
-        <button type="button" class="btn btn-success w-100" onclick="finalSubmit()">
+        <button type="button" class="btn btn-success w-100" onclick="showReview()">
           Create Account
         </button>
 
@@ -126,39 +125,102 @@
   </div>
 </section>
 
-<footer class="site-footer">
-  <div class="container footer-content">
-    <p class="footer-text">© 2026 Kisan Setu. All rights reserved.</p>
-    <p class="footer-brand">🌾 <strong>Kisan Setu</strong></p>
+<!-- REVIEW MODAL -->
+<div class="modal fade" id="reviewModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Review Your Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><strong>Full Name:</strong> <span id="rName"></span></li>
+          <li class="list-group-item"><strong>Username:</strong> <span id="rUsername"></span></li>
+          <li class="list-group-item"><strong>Email:</strong> <span id="rEmail"></span></li>
+          <li class="list-group-item"><strong>Mobile:</strong> <span id="rMobile"></span></li>
+          <li class="list-group-item"><strong>Age:</strong> <span id="rAge"></span></li>
+          <li class="list-group-item"><strong>Location:</strong> <span id="rLocation"></span></li>
+          <li class="list-group-item"><strong>Work Type:</strong> <span id="rWork"></span></li>
+          <li class="list-group-item"><strong>Experience:</strong> <span id="rExperience"></span></li>
+          <li class="list-group-item"><strong>Availability:</strong> <span id="rAvailability"></span></li>
+        </ul>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Edit</button>
+        <button class="btn btn-success" onclick="confirmCreateWorker()">Confirm & Create</button>
+      </div>
+
+    </div>
   </div>
-</footer>
+</div>
 
 <script>
-  const { createClient } = supabase;
-
-  const supabaseClient = createClient(
+  const supabaseClient = supabase.createClient(
     "https://kyujketzdhkbykybjywu.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA"
+    "YOUR_ANON_PUBLIC_KEY"
   );
 
-  async function finalSubmit() {
-    const form = document.getElementById("workerForm");
+  let usernameAvailable = false;
 
-    // ✅ Frontend validation
-    if (!form.checkValidity()) {
-      alert("Please fill out all required details before continuing.");
-      form.reportValidity();
+  async function checkUsernameAvailability() {
+    const uname = username.value.trim();
+    const status = document.getElementById("usernameStatus");
+
+    if (!uname) {
+      status.textContent = "";
+      usernameAvailable = false;
       return;
     }
 
-    const emailVal = document.getElementById("email").value;
-    const passwordVal = document.getElementById("password").value;
-    const usernameVal = document.getElementById("username").value;
+    const { data } = await supabaseClient
+      .from("profiles")
+      .select("id")
+      .eq("username", uname)
+      .maybeSingle();
 
-    // 1️⃣ Create auth user
+    if (data) {
+      status.textContent = "Username already taken";
+      status.className = "text-danger";
+      usernameAvailable = false;
+    } else {
+      status.textContent = "Username available";
+      status.className = "text-success";
+      usernameAvailable = true;
+    }
+  }
+
+  function showReview() {
+    if (!workerForm.checkValidity()) {
+      workerForm.reportValidity();
+      return;
+    }
+
+    if (!usernameAvailable) {
+      alert("Please choose a different username.");
+      return;
+    }
+
+    rName.textContent = name.value;
+    rUsername.textContent = username.value;
+    rEmail.textContent = email.value;
+    rMobile.textContent = mobile.value;
+    rAge.textContent = age.value;
+    rLocation.textContent = location.value;
+    rWork.textContent = work.value;
+    rExperience.textContent = experience.value;
+    rAvailability.textContent = availability.value;
+
+    new bootstrap.Modal(document.getElementById("reviewModal")).show();
+  }
+
+  async function confirmCreateWorker() {
     const { data, error } = await supabaseClient.auth.signUp({
-      email: emailVal,
-      password: passwordVal
+      email: email.value,
+      password: password.value
     });
 
     if (error) {
@@ -166,23 +228,20 @@
       return;
     }
 
-    const userId = data.user.id;
-
-    // 2️⃣ Upsert worker profile
     const { error: profileError } = await supabaseClient
       .from("profiles")
-      .upsert({
-        id: userId,
-        username: usernameVal,
+      .insert({
+        id: data.user.id,
         role: "worker",
-        full_name: document.getElementById("name").value,
-        mobile: document.getElementById("mobile").value,
-        age: document.getElementById("age").value,
-        location: document.getElementById("location").value,
-        work_type: document.getElementById("work").value,
-        experience: document.getElementById("experience").value,
-        availability: document.getElementById("availability").value,
-        onboarding_completed: true
+        username: username.value,
+        full_name: name.value,
+        mobile: mobile.value,
+        age: age.value,
+        location: location.value,
+        work_type: work.value,
+        experience: experience.value,
+        availability: availability.value,
+        onboarding_completed: false
       });
 
     if (profileError) {
