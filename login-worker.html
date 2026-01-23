@@ -91,7 +91,7 @@
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + "auth-callback.html"
+        redirectTo: window.location.origin + "/auth-callback.html"
       }
     });
 
@@ -128,7 +128,7 @@
     }
 
     await supabaseClient.auth.setSession(result.session);
-    window.location.href = "auth-callback.html";
+    window.location.href = "/auth-callback.html";
   }
 </script>
 

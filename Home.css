@@ -1,14 +1,21 @@
-/* GLOBAL */
+/* =========================
+   GLOBAL
+========================= */
 body {
   background-color: #f4f8f3;
   font-family: 'Segoe UI', sans-serif;
   color: #2f2f2f;
-
 }
 
-/* HERO SECTION */
+html {
+  scroll-behavior: smooth;
+}
+
+/* =========================
+   HERO SECTION
+========================= */
 .hero-section {
-  min-height: 85vh;  
+  min-height: 85vh;
   padding-bottom: 80px;
   padding-top: 110px;
   background-image:
@@ -19,7 +26,6 @@ body {
     url("Assets/Images/Farm.webp");
   background-size: cover;
   background-position: center;
-
 }
 
 /* HERO TEXT */
@@ -34,9 +40,47 @@ body {
   max-width: 520px;
 }
 
+/* HERO ENTRY ANIMATION (SAFE) */
+.hero-section h1,
+.hero-section p,
+.hero-section a {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroFadeUp 0.8s ease forwards;
+}
 
+.hero-section h1 { animation-delay: 0.15s; }
+.hero-section p  { animation-delay: 0.35s; }
+.hero-section a  { animation-delay: 0.55s; }
 
-/* BUTTONS */
+@keyframes heroFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* HERO IMAGE */
+.hero-right-image {
+  max-width: 100%;
+  height: auto;
+  opacity: 0.8;
+  animation: floatImage 4s ease-in-out infinite;
+}
+
+@keyframes floatImage {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
 .btn-success {
   background-color: #2e7d32;
   border: none;
@@ -52,15 +96,50 @@ body {
   border-width: 2px;
 }
 
-/* FEATURES SECTION */
-.features-section {
-  background-color: #ffffff;
-  padding: 140px 0 80px; 
+.btn:active {
+  transform: translateY(1px) scale(0.98);
 }
 
+/* =========================
+   NAVBAR
+========================= */
+.navbar-nav {
+  gap: 36px;
+}
 
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+  margin-top: 0;
+}
 
-/* FEATURE CARD */
+.nav-item:hover .nav-link {
+  color: #256528;
+}
+
+.dropdown-menu {
+  border-radius: 12px;
+  padding: 8px 0;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.dropdown-item {
+  padding: 10px 18px;
+  font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f4f8f3;
+  color: #2e7d32;
+}
+
+/* =========================
+   FEATURES SECTION
+========================= */
+.features-section {
+  background-color: #ffffff;
+  padding: 140px 0 80px;
+}
+
 .feature-card {
   background: #f4f8f3;
   padding: 30px 20px;
@@ -75,33 +154,23 @@ body {
   box-shadow: 0 20px 45px rgba(0,0,0,0.12);
 }
 
-/* ICON */
 .feature-icon {
   font-size: 2rem;
   margin-bottom: 15px;
+  transition: transform 0.3s ease;
 }
 
-/* HERO RIGHT IMAGE ONLY */
-.hero-right-image {
-  max-width: 100%;
-  height: auto;
-  opacity: 0.8; 
+.feature-card:hover .feature-icon {
+  transform: scale(1.2);
 }
 
-.navbar-nav {
-  gap: 36px;  
-}
-
-
-/* ===========================
-   STORY SCROLL WRAPPER
-=========================== */
-
+/* =========================
+   STORY SCROLL
+========================= */
 .story-wrapper {
   position: relative;
 }
 
-/* PROGRESS DOTS */
 .story-progress {
   position: fixed;
   right: 30px;
@@ -119,14 +188,14 @@ body {
   border-radius: 50%;
 }
 
-/* SCROLL SNAP CONTAINER */
+/* SCROLL CONTAINER */
 .story-scroll {
   height: 100vh;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
 }
 
-/* EACH FULL SCREEN SLIDE */
+/* SLIDES */
 .story-slide {
   height: 100vh;
   scroll-snap-align: start;
@@ -139,13 +208,11 @@ body {
   animation: bgFade 1.5s ease;
 }
 
-/* FADE EFFECT */
 @keyframes bgFade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-/* DARK OVERLAY */
 .story-slide::before {
   content: "";
   position: absolute;
@@ -153,7 +220,7 @@ body {
   background: rgba(0,0,0,0.55);
 }
 
-/* CONTENT CARD */
+/* STORY CARD */
 .story-content {
   position: relative;
   z-index: 2;
@@ -165,21 +232,18 @@ body {
   box-shadow: 0 30px 60px rgba(0,0,0,0.25);
 }
 
-/* TEXT */
 .story-content p {
   font-size: 1.4rem;
   font-style: italic;
   margin-bottom: 20px;
 }
 
-/* STARS */
 .stars {
   color: #f4b400;
   font-size: 1.2rem;
   margin-bottom: 15px;
 }
 
-/* ROLE BADGES */
 .role {
   display: inline-block;
   padding: 6px 16px;
@@ -192,7 +256,6 @@ body {
 .role.farmer { background: #2e7d32; }
 .role.worker { background: #1565c0; }
 
-/* SCROLL HINT */
 .scroll-hint {
   margin-top: 25px;
   font-size: 0.9rem;
@@ -205,46 +268,40 @@ body {
   50% { transform: translateY(6px); }
 }
 
-/* BACKGROUND IMAGES */
+/* BACKGROUNDS */
 .bg-1 { background-image: url("Assets/Images/image2.jpeg"); }
 .bg-2 { background-image: url("Assets/Images/image1.jpeg"); }
 .bg-3 { background-image: url("Assets/Images/image3.jpeg"); }
 .bg-4 { background-image: url("Assets/Images/image4.jpeg"); }
 .bg-5 { background-image: url("Assets/Images/image5.jpeg"); }
 
-/* MOBILE FALLBACK */
+/* MOBILE */
 @media (max-width: 768px) {
   .story-progress { display: none; }
   .story-scroll { scroll-snap-type: none; }
 }
 
-/* PRE-FOOTER */
+/* =========================
+   PRE FOOTER
+========================= */
 .pre-footer {
-  background-color: #ffffff; /* MATCHES FOOTER */
+  background-color: #ffffff;
   padding: 40px 0;
   border-top: 1px solid #e6e6e6;
 }
 
-/* CENTER LINKS BLOCK MORE PRECISELY */
 .pre-footer .col-md-8 {
   display: flex;
   justify-content: right;
 }
 
-
-/* GRID FOR LINKS */
 .footer-links-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 40px;
-
-  max-width: 420px;      
-  margin: 3 auto;       
+  max-width: 420px;
 }
 
-
-
-/* LINK LIST */
 .footer-links-grid ul {
   list-style: none;
   padding: 0;
@@ -264,7 +321,6 @@ body {
   color: #2e7d32;
 }
 
-/* SCROLL TO TOP */
 .scroll-top {
   font-size: 0.95rem;
   color: #2e7d32;
@@ -276,107 +332,32 @@ body {
   text-decoration: underline;
 }
 
-
-
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 .site-footer {
   background-color: #ffffff;
   border-top: 1px solid #e6e6e6;
   padding: 20px 0;
 }
 
-/* FOOTER LAYOUT */
 .footer-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* TEXT */
 .footer-text {
   margin: 0;
   font-size: 0.9rem;
   color: #777;
 }
 
-/* BRANDING */
 .footer-brand {
   margin: 0;
   font-size: 1rem;
   color: #2e7d32;
 }
-
-
-/* SHOW DROPDOWN ON HOVER */
-.nav-item.dropdown:hover .dropdown-menu {
-  display: block;
-  margin-top: 0;
-}
-
-.nav-item:hover .nav-link {
-  color: #256528;
-} 
-
-/* CLEAN DROPDOWN LOOK */
-.dropdown-menu {
-  border-radius: 12px;
-  padding: 8px 0;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-}
-
-/* DROPDOWN ITEMS */
-.dropdown-item {
-  padding: 10px 18px;
-  font-size: 0.95rem;
-}
-
-.dropdown-item:hover {
-  background-color: #f4f8f3;
-  color: #2e7d32;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 section {
   position: relative;
