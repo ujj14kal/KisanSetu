@@ -1,275 +1,364 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kisan Setu</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kisan Setu</title>
+
 <link rel="icon" href="data:image/svg+xml;utf8,
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='90'>🌾</text>
+<text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='90'>🌾</text>
 </svg>">
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="Home.css">
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="Home.css">
+<style>
+
+/* GOOGLE TRANSLATE FIX */
+
+body{
+top:0 !important;
+}
+
+.goog-te-banner-frame.skiptranslate{
+display:none !important;
+visibility:hidden !important;
+height:0 !important;
+}
+
+.goog-logo-link{
+display:none !important;
+}
+
+.goog-te-gadget{
+font-size:0px;
+}
+
+.skiptranslate iframe{
+display:none !important;
+}
+
+/* LANGUAGE BUTTON */
+
+.lang-btn{
+border:1px solid #198754;
+color:#198754;
+background:white;
+padding:6px 14px;
+border-radius:6px;
+font-weight:500;
+}
+
+.lang-btn:hover{
+background:#198754;
+color:white;
+}
+
+</style>
+
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-    <div class="container">
-      <a class="navbar-brand fw-bold text-success" href="#">🌾 Kisan Setu</a>
+<!-- NAVBAR -->
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+<div class="container">
 
-      <div class="collapse navbar-collapse" id="nav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" href="support.html">Support</a></li>
-          <li class="nav-item"><a class="nav-link" href="process.html">Process</a></li>
-          <li class="nav-item dropdown ms-lg-3">
-  <a
-    class="btn btn-success px-4 dropdown-toggle"
-    href="#"
-    id="loginDropdown"
-    role="button"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"
-  >
-    Login
-  </a>
+<a class="navbar-brand fw-bold text-success" href="#">🌾 Kisan Setu</a>
 
-  <ul class="dropdown-menu dropdown-menu-end">
-    <li>
-      <a class="dropdown-item" href="login-farmer.html">
-        🌾 Login as Farmer
-      </a>
-    </li>
-    <li>
-      <a class="dropdown-item" href="login-worker.html">
-        👩‍🌾 Login as Landlord
-      </a>
-    </li>
-  </ul>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="nav">
+
+<ul class="navbar-nav ms-auto">
+
+<li class="nav-item">
+<a class="nav-link active" href="support.html">Support</a>
 </li>
 
-        </ul>
-      </div>
-    </div>
-  </nav>
+<li class="nav-item">
+<a class="nav-link" href="process.html">Process</a>
+</li>
 
-  <!-- HERO SECTION -->
-  <section class="hero-section mb-5">
-    <div class="container">
-      <div class="row">
+<li class="nav-item ms-lg-3 d-flex gap-2">
+<button class="lang-btn" onclick="translateHindi()">🌐 हिन्दी</button>
+<button class="lang-btn" onclick="translateEnglish()">English</button>
+</li>
 
-        <div class="col-md-6">
-          <h1 class="fw-bold mb-3">
-            Connecting Farmers to Verified Agricultural Landlords
-          </h1>
-          <p class="text-muted mb-4">
-            Farmers can find verified agricultural landlords, and landlords can find trusted, verified farmers — all on Kisan Setu.
-          </p>
+<li class="nav-item dropdown ms-lg-3">
 
-          <a href="login-farmer.html" class="btn btn-success px-4 me-3">I am a Farmer</a>
-          <a href="login-worker.html" class="btn btn-outline-success px-4">I am a Landlord</a>
-        </div>
+<a class="btn btn-success px-4 dropdown-toggle"
+href="#"
+role="button"
+data-bs-toggle="dropdown">
 
-        <div class="col-md-6 text-center d-none d-md-block">
-  <img 
-    src= "Assets/Images/Farming.png"
-    alt="Farmers and landlords illustration"
-    class="hero-right-image"
-  />
+Login
+
+</a>
+
+<ul class="dropdown-menu dropdown-menu-end">
+
+<li>
+<a class="dropdown-item" href="login-farmer.html">
+🌾 Login as Farmer
+</a>
+</li>
+
+<li>
+<a class="dropdown-item" href="login-worker.html">
+👩‍🌾 Login as Landlord
+</a>
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+</div>
+</div>
+</nav>
+
+<!-- HERO SECTION -->
+
+<section class="hero-section mb-5">
+<div class="container">
+<div class="row">
+
+<div class="col-md-6">
+
+<h1 class="fw-bold mb-3">
+Connecting Farmers to Verified Agricultural Landlords
+</h1>
+
+<p class="text-muted mb-4">
+Farmers can find verified agricultural landlords, and landlords can find trusted, verified farmers — all on Kisan Setu.
+</p>
+
+<a href="login-farmer.html" class="btn btn-success px-4 me-3">
+I am a Farmer
+</a>
+
+<a href="login-worker.html" class="btn btn-outline-success px-4">
+I am a Landlord
+</a>
+
 </div>
 
+<div class="col-md-6 text-center d-none d-md-block">
 
-      </div>
-    </div>
-  </section>
+<img 
+src="Assets/Images/Farming.png"
+alt="Farmers and landlords illustration"
+class="hero-right-image"
+/>
 
+</div>
 
-
-  <!-- FEATURES -->
- <!-- FEATURES SECTION -->
-<section class="features-section">
-  <div class="container">
-
-    <div class="text-center mb-5">
-      <h2 class="fw-bold">Why Kisan Setu?</h2>
-      <p class="text-muted">Built for trust, privacy, and simplicity</p>
-    </div>
-
-    <div class="row g-4">
-      <div class="col-md-3">
-        <div class="feature-card text-center">
-          <div class="feature-icon">✔</div>
-          <h5>Aadhaar Verified</h5>
-          <p>All landlords verified via OTP & Aadhaar</p>
-        </div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="feature-card text-center">
-          <div class="feature-icon">🔒</div>
-          <h5>Privacy First</h5>
-          <p>Partial profile visibility by default</p>
-        </div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="feature-card text-center">
-          <div class="feature-icon">📋</div>
-          <h5>Hiring History</h5>
-          <p>Transparent work records</p>
-        </div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="feature-card text-center">
-          <div class="feature-icon">📱</div>
-          <h5>Simple to Use</h5>
-          <p>Mobile-first, farmer-friendly design</p>
-        </div>
-      </div>
-    </div>
-
-  </div>
+</div>
+</div>
 </section>
 
-<!-- SCROLL STORY TESTIMONIALS -->
+<!-- FEATURES -->
+
+<section class="features-section">
+<div class="container">
+
+<div class="text-center mb-5">
+<h2 class="fw-bold">Why Kisan Setu?</h2>
+<p class="text-muted">Built for trust, privacy, and simplicity</p>
+</div>
+
+<div class="row g-4">
+
+<div class="col-md-3">
+<div class="feature-card text-center">
+<div class="feature-icon">✔</div>
+<h5>Aadhaar Verified</h5>
+<p>All landlords verified via OTP & Aadhaar</p>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="feature-card text-center">
+<div class="feature-icon">🔒</div>
+<h5>Privacy First</h5>
+<p>Partial profile visibility by default</p>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="feature-card text-center">
+<div class="feature-icon">📋</div>
+<h5>Hiring History</h5>
+<p>Transparent work records</p>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="feature-card text-center">
+<div class="feature-icon">📱</div>
+<h5>Simple to Use</h5>
+<p>Mobile-first, farmer-friendly design</p>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- STORY TESTIMONIALS -->
+
 <section class="story-wrapper">
 
-  <div class="story-progress">
-    <span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span>
-  </div>
+<div class="story-progress">
+<span></span><span></span><span></span><span></span><span></span>
+<span></span><span></span><span></span><span></span><span></span>
+</div>
 
-  <div class="story-scroll">
+<div class="story-scroll">
 
-    <!-- REVIEW 1 -->
-    <section class="story-slide farmer bg-1">
-      <div class="story-content">
-        <span class="role farmer">Farmer</span>
-        <p>“Kisan Setu helped me find reliable landlords during harvest season.”</p>
-        <div class="stars">★★★★★</div>
-        <h4>Ramesh Yadav</h4>
-        <small>Haryana</small>
-        <div class="scroll-hint">↓ Scroll</div>
-      </div>
-    </section>
-
-    <!-- REVIEW 2 -->
-    <section class="story-slide worker bg-2">
-      <div class="story-content">
-        <span class="role worker">Landlord</span>
-        <p>“Now farmers trust me because my profile is verified.”</p>
-        <div class="stars">★★★★★</div>
-        <h4>Sunita Devi</h4>
-        <small>Bihar</small>
-        <div class="scroll-hint">↓ Scroll</div>
-      </div>
-    </section>
-
-    <!-- REVIEW 3 -->
-    <section class="story-slide farmer bg-3">
-      <div class="story-content">
-        <span class="role farmer">Farmer</span>
-        <p>“Hiring history helps me rehire trusted landlords easily.”</p>
-        <div class="stars">★★★★☆</div>
-        <h4>Balwant Singh</h4>
-        <small>Punjab</small>
-        <div class="scroll-hint">↓ Scroll</div>
-      </div>
-    </section>
-
-    <!-- REVIEW 4 -->
-    <section class="story-slide farmer bg-4">
-      <div class="story-content">
-        <span class="role worker">Landlord</span>
-        <p>“Kisan Setu made it very easy for me to find verified farmers during the harvesting season. The profiles are trustworthy and the process saved me a lot of time and effort.”</p>
-        <div class="stars">★★★★★</div>
-        <h4>Piyush Verma</h4>
-        <small>Punjab</small>
-        <div class="scroll-hint">↓ Scroll</div>
-      </div>
-    </section>
-
-    <!-- REVIEW 5 -->
-    <section class="story-slide worker bg-5">
-      <div class="story-content">
-        <span class="role farmer">Farmer</span>
-        <p>“The system feels safe and transparent, and I get work based on my experience.”</p>
-        <div class="stars">★★★★☆</div>
-        <h4>Suresh Pal</h4>
-        <small>Karnataka</small>
-        <div class="scroll-hint">↓ Scroll</div>
-      </div>
-    </section>
-
-
-  </div>
+<section class="story-slide farmer bg-1">
+<div class="story-content">
+<span class="role farmer">Farmer</span>
+<p>“Kisan Setu helped me find reliable landlords during harvest season.”</p>
+<div class="stars">★★★★★</div>
+<h4>Ramesh Yadav</h4>
+<small>Haryana</small>
+<div class="scroll-hint">↓ Scroll</div>
+</div>
 </section>
 
-<!-- PRE-FOOTER -->
+<section class="story-slide worker bg-2">
+<div class="story-content">
+<span class="role worker">Landlord</span>
+<p>“Now farmers trust me because my profile is verified.”</p>
+<div class="stars">★★★★★</div>
+<h4>Sunita Devi</h4>
+<small>Bihar</small>
+<div class="scroll-hint">↓ Scroll</div>
+</div>
+</section>
+
+<section class="story-slide farmer bg-3">
+<div class="story-content">
+<span class="role farmer">Farmer</span>
+<p>“Hiring history helps me rehire trusted landlords easily.”</p>
+<div class="stars">★★★★☆</div>
+<h4>Balwant Singh</h4>
+<small>Punjab</small>
+<div class="scroll-hint">↓ Scroll</div>
+</div>
+</section>
+
+<section class="story-slide farmer bg-4">
+<div class="story-content">
+<span class="role worker">Landlord</span>
+<p>“Kisan Setu made it very easy for me to find verified farmers during the harvesting season.”</p>
+<div class="stars">★★★★★</div>
+<h4>Piyush Verma</h4>
+<small>Punjab</small>
+<div class="scroll-hint">↓ Scroll</div>
+</div>
+</section>
+
+<section class="story-slide worker bg-5">
+<div class="story-content">
+<span class="role farmer">Farmer</span>
+<p>“The system feels safe and transparent, and I get work based on my experience.”</p>
+<div class="stars">★★★★☆</div>
+<h4>Suresh Pal</h4>
+<small>Karnataka</small>
+<div class="scroll-hint">↓ Scroll</div>
+</div>
+</section>
+
+</div>
+</section>
+
+<!-- PRE FOOTER -->
+
 <section class="pre-footer">
-  <div class="container">
-    <div class="row align-items-start">
+<div class="container">
+<div class="row align-items-start">
 
-      <!-- LINKS -->
-      <div class="col-md-8">
-        <div class="footer-links-grid">
+<div class="col-md-8">
+<div class="footer-links-grid">
 
-          <ul>
-            <li><a href="#">About Kisan Setu</a></li>
-            <li><a href="#">How It Works</a></li>
-            <li><a href="#">Support</a></li>
-          </ul>
+<ul>
+<li><a href="#">About Kisan Setu</a></li>
+<li><a href="#">How It Works</a></li>
+<li><a href="#">Support</a></li>
+</ul>
 
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms & Conditions</a></li>
-            <li><a href="#">Contact Us</a></li>
-          </ul>
+<ul>
+<li><a href="#">Privacy Policy</a></li>
+<li><a href="#">Terms & Conditions</a></li>
+<li><a href="#">Contact Us</a></li>
+</ul>
 
-        </div>
-      </div>
+</div>
+</div>
 
-      <!-- SCROLL TO TOP -->
-      <div class="col-md-4 text-md-end text-center">
-        <a href="#" class="scroll-top">↑ Back to top</a>
-      </div>
+<div class="col-md-4 text-md-end text-center">
+<a href="#" class="scroll-top">↑ Back to top</a>
+</div>
 
-    </div>
-  </div>
+</div>
+</div>
 </section>
 
+<!-- FOOTER -->
 
-
-
-  <!-- FOOTER -->
 <footer class="site-footer">
-  <div class="container">
-    <div class="footer-content">
-      <p class="footer-text">
-        © 2026 Kisan Setu. All rights reserved.
-      </p>
+<div class="container">
+<div class="footer-content">
 
-      <p class="footer-brand">
-        🌾 <strong>Kisan Setu</strong>
-      </p>
-    </div>
-  </div>
+<p class="footer-text">
+© 2026 Kisan Setu. All rights reserved.
+</p>
+
+<p class="footer-brand">
+🌾 <strong>Kisan Setu</strong>
+</p>
+
+</div>
+</div>
 </footer>
 
-         
+<div id="google_translate_element" style="display:none"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+function googleTranslateElementInit(){
+new google.translate.TranslateElement(
+{pageLanguage:'en',includedLanguages:'hi'},
+'google_translate_element'
+);
+}
+
+function translateHindi(){
+document.cookie="googtrans=/en/hi;path=/";
+location.reload();
+}
 
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+function translateEnglish(){
+document.cookie="googtrans=/en/en;path=/";
+location.reload();
+}
+
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
 </html>
+
+
