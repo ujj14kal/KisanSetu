@@ -11,9 +11,6 @@
 
   <link rel="stylesheet" href="Home.css">
   <link rel="stylesheet" href="auth.css">
-
-
-
 </head>
 <body>
 
@@ -55,6 +52,8 @@
 
   let isSubscribed = false;
   let sessionUser = null;
+  // Map of farmerId -> latest job { status, cooldown_until }
+  let existingRequests = {};
 
   async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -77,6 +76,27 @@
 
     document.getElementById("subscriptionWarning")
       .classList.toggle("d-none", isSubscribed);
+
+    // Load all existing requests for this worker so we can check duplicates
+    await loadExistingRequests();
+  }
+
+  async function loadExistingRequests() {
+    const { data } = await supabaseClient
+      .from("jobs")
+      .select("farmer_id, status, cooldown_until, created_at")
+      .eq("worker_id", sessionUser.id)
+      .order("created_at", { ascending: false });
+
+    if (!data) return;
+
+    // Keep only the latest request per farmer
+    existingRequests = {};
+    data.forEach(job => {
+      if (!existingRequests[job.farmer_id]) {
+        existingRequests[job.farmer_id] = job;
+      }
+    });
   }
 
   async function searchFarmers() {
@@ -95,10 +115,8 @@
       .select(`
         id,
         full_name,
-        phone,
         location,
         skill,
-        crops,
         availability,
         aadhar_verified
       `)
@@ -107,27 +125,50 @@
 
     results.innerHTML = "";
 
-    if (error || !farmers.length) {
+    if (error || !farmers || !farmers.length) {
       results.innerHTML = `<p class="text-muted text-center">No farmers found.</p>`;
       return;
     }
 
     farmers.forEach(f => {
+      const existing = existingRequests[f.id];
+      let actionHtml = "";
+
+      if (!isSubscribed) {
+        actionHtml = `<button class="btn btn-outline-secondary w-100" disabled>Subscribe to Send Request</button>`;
+      } else if (existing) {
+        const status = existing.status;
+        const cooldown = existing.cooldown_until ? new Date(existing.cooldown_until) : null;
+        const inCooldown = cooldown && cooldown > new Date();
+
+        if (status === "pending") {
+          actionHtml = `<button class="btn btn-warning w-100" disabled>Request Already Sent</button>`;
+        } else if (status === "accepted") {
+          actionHtml = `<button class="btn btn-success w-100" disabled>Request Accepted</button>`;
+        } else if (status === "declined" && inCooldown) {
+          actionHtml = `
+            <button class="btn btn-danger w-100" disabled>
+              Declined — wait <span id="cd-${f.id}">...</span>
+            </button>`;
+        } else {
+          // declined + cooldown over, allow re-request
+          actionHtml = `
+            <button class="btn btn-success w-100" onclick="hireFarmer('${f.id}', '${f.location || ""}')">
+              Send Hiring Request
+            </button>`;
+        }
+      } else {
+        actionHtml = `
+          <button class="btn btn-success w-100" onclick="hireFarmer('${f.id}', '${f.location || ""}')">
+            Send Hiring Request
+          </button>`;
+      }
+
+      // Only show non-sensitive info before acceptance
       results.innerHTML += `
         <div class="border rounded p-3 mb-3 bg-white shadow-sm text-start">
-
           <h5 class="fw-bold text-success mb-1">${f.full_name}</h5>
-          <p class="text-muted small mb-2">${f.location}</p>
-
-          <div class="row small mb-2">
-            <div class="col-6"><strong>Phone:</strong> ${f.phone || "—"}</div>
-            <div class="col-6">
-              <strong>Aadhaar:</strong>
-              <span class="badge ${f.aadhar_verified ? 'bg-success' : 'bg-warning'}">
-                ${f.aadhar_verified ? 'Verified' : 'Pending'}
-              </span>
-            </div>
-          </div>
+          <p class="text-muted small mb-2">📍 ${f.location}</p>
 
           <div class="row small mb-2">
             <div class="col-6"><strong>Skill:</strong> ${f.skill || "—"}</div>
@@ -135,25 +176,75 @@
           </div>
 
           <div class="small mb-3">
-            <strong>Crops:</strong> ${f.crops || "—"}
+            <strong>Aadhaar:</strong>
+            <span class="badge ${f.aadhar_verified ? 'bg-success' : 'bg-warning'}">
+              ${f.aadhar_verified ? 'Verified' : 'Pending'}
+            </span>
           </div>
 
-          ${
-            isSubscribed
-            ? `<button class="btn btn-success w-100"
-                onclick="hireFarmer('${f.id}', '${f.location || ""}')">
-                Send Hiring Request
-              </button>`
-            : `<button class="btn btn-outline-secondary w-100" disabled>
-                Subscribe to Send Request
-              </button>`
-          }
-
+          ${actionHtml}
         </div>`;
+    });
+
+    // Start countdowns for declined + in-cooldown farmers
+    farmers.forEach(f => {
+      const existing = existingRequests[f.id];
+      if (existing?.status === "declined" && existing.cooldown_until) {
+        const cooldown = new Date(existing.cooldown_until);
+        if (cooldown > new Date()) {
+          startCountdown(`cd-${f.id}`, existing.cooldown_until);
+        }
+      }
     });
   }
 
+  function startCountdown(elementId, cooldownUntil) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    const target = new Date(cooldownUntil).getTime();
+
+    const interval = setInterval(() => {
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        clearInterval(interval);
+        el.closest("button").outerHTML = `
+          <button class="btn btn-success w-100" onclick="location.reload()">
+            Cooldown over — Refresh to send request
+          </button>`;
+        return;
+      }
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+      el.innerText = `${h}h ${m}m ${s}s`;
+    }, 1000);
+  }
+
   async function hireFarmer(farmerId, farmerLocation) {
+    // Double-check on submit to prevent race conditions
+    await loadExistingRequests();
+    const existing = existingRequests[farmerId];
+
+    if (existing) {
+      const status = existing.status;
+      const cooldown = existing.cooldown_until ? new Date(existing.cooldown_until) : null;
+      const inCooldown = cooldown && cooldown > new Date();
+
+      if (status === "pending") {
+        alert("You have already sent a request to this farmer.");
+        return;
+      }
+      if (status === "accepted") {
+        alert("This farmer has already accepted your request.");
+        return;
+      }
+      if (status === "declined" && inCooldown) {
+        alert("You cannot send another request during the cooldown period.");
+        return;
+      }
+    }
+
     const { error } = await supabaseClient
       .from("jobs")
       .insert([{
@@ -170,23 +261,54 @@
     }
   }
 
-  function handlePayment() {
+  // Subscription handling with Razorpay
+async function handlePayment() {
+  if (!currentUser) { alert("Session not found."); return; }
+
+  try {
+    const res = await fetch(
+  "https://kyujketzdhkbykybjywu.supabase.co/functions/v1/create-subscription",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
+    },
+    body: JSON.stringify({
+      user_id: currentUser.id,       // sessionUser.id in search-farmers.html
+      user_email: currentUser.email, // sessionUser.email in search-farmers.html
+    }),
+  }
+);
+
+    const { subscription_id, error } = await res.json();
+    if (error || !subscription_id) {
+      alert("Could not create subscription: " + (error || "unknown error"));
+      return;
+    }
+
     const options = {
-      key: "rzp_test_S1PAt6cRY4BTfV",
-      amount: 2000,
-      currency: "INR",
+      key: "rzp_test_STZ6trtojWVF57",
+      subscription_id: subscription_id,
       name: "Kisan Setu",
       description: "Worker Subscription",
-      notes: { user_id: sessionUser.id },
-      prefill: { email: sessionUser.email },
-      handler: () => {
-        alert("Payment successful!");
-        location.href = "profile-worker.html";
+      prefill: { email: currentUser.email },
+      handler: async function (response) {
+        await supabaseClient
+          .from("profiles")
+          .update({ subscription_active: true })
+          .eq("id", currentUser.id);
+        alert("Subscription activated! Refreshing…");
+        setTimeout(() => location.reload(), 2000);
       },
-      theme: { color: "#198754" }
+      theme: { color: "#198754" },
     };
     new Razorpay(options).open();
+
+  } catch (err) {
+    alert("Something went wrong: " + err.message);
   }
+}
 
   async function logout() {
     await supabaseClient.auth.signOut();
@@ -196,8 +318,5 @@
   init();
 </script>
 
-
-
 </body>
 </html>
-
