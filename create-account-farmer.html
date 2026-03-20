@@ -2,21 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Create Farmer Account | Kisan Setu</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <link rel="icon" type="image/svg+xml"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='90'%3E🌾%3C/text%3E%3C/svg%3E">
-
   <link rel="stylesheet" href="Home.css">
   <link rel="stylesheet" href="auth.css">
-
-
-
 </head>
+
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
@@ -36,11 +31,12 @@
 
       <form id="farmerForm" novalidate>
 
+        <!-- CONTACT -->
         <h6 class="mb-3">Contact Details</h6>
 
         <div class="mb-3">
           <label class="form-label">Mobile Number</label>
-          <input type="tel" class="form-control" id="mobile" required>
+          <input type="tel" class="form-control" id="mobile" pattern="[0-9]{10}" maxlength="10" required>
         </div>
 
         <div class="mb-3">
@@ -48,6 +44,7 @@
           <input type="email" class="form-control" id="email" required>
         </div>
 
+        <!-- LOGIN -->
         <h6 class="mb-3 mt-4">Login Credentials</h6>
 
         <div class="mb-1">
@@ -58,9 +55,10 @@
 
         <div class="mb-3 mt-3">
           <label class="form-label">Password</label>
-          <input type="password" class="form-control" id="password" required>
+          <input type="password" class="form-control" id="password" minlength="6" required>
         </div>
 
+        <!-- PROFILE -->
         <h6 class="mb-3 mt-4">Farmer Profile</h6>
 
         <div class="mb-3">
@@ -75,18 +73,20 @@
 
         <div class="mb-3">
           <label class="form-label">Location</label>
-          <input type="text" class="form-control" id="location" required>
+          <!-- FIX 1: renamed id from "location" to "userLocation" -->
+          <input type="text" class="form-control" id="userLocation" required>
         </div>
 
+        <!-- MULTI SELECT FARM TYPE -->
         <div class="mb-3">
           <label class="form-label">Farm Type</label>
-          <select class="form-select" id="farmType" required>
-            <option value="">Select type</option>
-            <option>Crop Farming</option>
-            <option>Dairy</option>
-            <option>Mixed Farming</option>
-            <option>Horticulture</option>
+          <select class="form-select" id="farmType" multiple required>
+            <option value="Crop Farming">Crop Farming</option>
+            <option value="Dairy">Dairy</option>
+            <option value="Mixed Farming">Mixed Farming</option>
+            <option value="Horticulture">Horticulture</option>
           </select>
+          <small class="text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
         </div>
 
         <div class="mb-3">
@@ -94,26 +94,7 @@
           <input type="text" class="form-control" id="crops">
         </div>
 
-        <div class="mb-3">
-          <label class="form-label">Experience</label>
-          <select class="form-select" id="experience">
-            <option value="">Select</option>
-            <option>Less than 1 year</option>
-            <option>1–3 years</option>
-            <option>3–5 years</option>
-            <option>5+ years</option>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Availability</label>
-          <select class="form-select" id="availability">
-            <option value="">Select</option>
-            <option>Seasonal</option>
-            <option>Year-round</option>
-          </select>
-        </div>
-
+        <!-- AADHAAR -->
         <h6 class="mb-3 mt-4">Aadhaar Verification</h6>
 
         <div class="mb-3">
@@ -148,23 +129,20 @@
 
       <div class="modal-body">
         <ul class="list-group list-group-flush">
-          <li class="list-group-item"><strong>Full Name:</strong> <span id="rFullName"></span></li>
+          <li class="list-group-item"><strong>Name:</strong> <span id="rFullName"></span></li>
           <li class="list-group-item"><strong>Username:</strong> <span id="rUsername"></span></li>
           <li class="list-group-item"><strong>Email:</strong> <span id="rEmail"></span></li>
           <li class="list-group-item"><strong>Mobile:</strong> <span id="rMobile"></span></li>
-          <li class="list-group-item"><strong>Age:</strong> <span id="rAge"></span></li>
           <li class="list-group-item"><strong>Location:</strong> <span id="rLocation"></span></li>
           <li class="list-group-item"><strong>Farm Type:</strong> <span id="rFarmType"></span></li>
           <li class="list-group-item"><strong>Crops:</strong> <span id="rCrops"></span></li>
-          <li class="list-group-item"><strong>Experience:</strong> <span id="rExperience"></span></li>
-          <li class="list-group-item"><strong>Availability:</strong> <span id="rAvailability"></span></li>
-          <li class="list-group-item"><strong>Aadhaar:</strong> Front & Back uploaded</li>
+          <li class="list-group-item"><strong>Aadhaar:</strong> Uploaded</li>
         </ul>
       </div>
 
       <div class="modal-footer">
         <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Edit</button>
-        <button class="btn btn-success" onclick="confirmCreateAccount()">Confirm & Create</button>
+        <button class="btn btn-success" onclick="confirmCreateAccount(event)">Confirm & Create</button>
       </div>
 
     </div>
@@ -172,119 +150,143 @@
 </div>
 
 <script>
-  const supabaseClient = supabase.createClient(
-    "https://kyujketzdhkbykybjywu.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA"
-  );
+const supabaseClient = supabase.createClient(
+  "https://kyujketzdhkbykybjywu.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA"
+);
 
-  let usernameAvailable = false;
+let usernameAvailable = false;
 
-  async function checkUsernameAvailability() {
-    const uname = username.value.trim();
-    const status = document.getElementById("usernameStatus");
+async function checkUsernameAvailability() {
+  const uname = document.getElementById("username").value.trim();
+  const status = document.getElementById("usernameStatus");
 
-    if (!uname) {
-      status.textContent = "";
-      usernameAvailable = false;
-      return;
-    }
+  if (!uname) return;
 
-    const { data } = await supabaseClient
-      .from("profiles")
-      .select("id")
-      .eq("username", uname)
-      .maybeSingle();
+  const { data } = await supabaseClient
+    .from("profiles")
+    .select("id")
+    .eq("username", uname)
+    .maybeSingle();
 
-    if (data) {
-      status.textContent = "Username already taken";
-      status.className = "text-danger";
-      usernameAvailable = false;
-    } else {
-      status.textContent = "Username available";
-      status.className = "text-success";
-      usernameAvailable = true;
-    }
+  if (data) {
+    status.textContent = "Username already taken";
+    status.className = "text-danger";
+    usernameAvailable = false;
+  } else {
+    status.textContent = "Username available";
+    status.className = "text-success";
+    usernameAvailable = true;
+  }
+}
+
+function showReview() {
+  if (!farmerForm.checkValidity()) {
+    farmerForm.reportValidity();
+    return;
   }
 
-  function showReview() {
-    if (!farmerForm.checkValidity()) {
-      farmerForm.reportValidity();
-      return;
-    }
+  const selectedFarmTypes = Array.from(document.getElementById("farmType").selectedOptions).map(o => o.value);
 
-    if (!usernameAvailable) {
-      alert("Please choose a different username.");
-      return;
-    }
+  document.getElementById("rFullName").textContent = document.getElementById("fullName").value;
+  document.getElementById("rUsername").textContent = document.getElementById("username").value;
+  document.getElementById("rEmail").textContent = document.getElementById("email").value;
+  document.getElementById("rMobile").textContent = document.getElementById("mobile").value;
+  // FIX 1: using updated ID userLocation
+  document.getElementById("rLocation").textContent = document.getElementById("userLocation").value;
+  document.getElementById("rFarmType").textContent = selectedFarmTypes.join(", ");
+  document.getElementById("rCrops").textContent = document.getElementById("crops").value || "—";
 
-    rFullName.textContent = fullName.value;
-    rUsername.textContent = username.value;
-    rEmail.textContent = email.value;
-    rMobile.textContent = mobile.value;
-    rAge.textContent = age.value;
-    rLocation.textContent = location.value;
-    rFarmType.textContent = farmType.value;
-    rCrops.textContent = crops.value || "—";
-    rExperience.textContent = experience.value || "—";
-    rAvailability.textContent = availability.value || "—";
+  new bootstrap.Modal(document.getElementById("reviewModal")).show();
+}
 
-    new bootstrap.Modal(document.getElementById("reviewModal")).show();
+async function confirmCreateAccount(event) {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.innerText = "Creating...";
+
+  const { data: existing } = await supabaseClient
+    .from("profiles")
+    .select("id")
+    .eq("username", document.getElementById("username").value)
+    .maybeSingle();
+
+  if (existing) {
+    alert("Username already taken");
+    btn.disabled = false;
+    btn.innerText = "Confirm & Create";
+    return;
   }
 
-  async function confirmCreateAccount() {
-    const { data, error } = await supabaseClient.auth.signUp({
-      email: email.value,
-      password: password.value
-    });
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: document.getElementById("email").value,
+    password: document.getElementById("password").value
+  });
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    const userId = data.user.id;
-
-    const { error: profileError } = await supabaseClient
-      .from("profiles")
-      .insert({
-        id: userId,
-        role: "farmer",
-        username: username.value,
-        full_name: fullName.value,
-        phone: mobile.value,
-        age: age.value,
-        location: location.value,
-        farm_type: farmType.value,
-        crops: crops.value,
-        experience: experience.value,
-        availability: availability.value,
-        aadhar_verified: false,
-        onboarding_completed: false
-      });
-
-    if (profileError) {
-      alert(profileError.message);
-      return;
-    }
-
-    await supabaseClient.auth.signOut();
-    alert("Account created successfully. Please login.");
-    window.location.href = "login-farmer.html";
+  if (error) {
+    alert(error.message);
+    btn.disabled = false;
+    btn.innerText = "Confirm & Create";
+    return;
   }
+
+  const userId = data.user.id;
+
+  const frontFile = document.getElementById("aadhaarFront").files[0];
+  const backFile = document.getElementById("aadhaarBack").files[0];
+
+const userName = document.getElementById("fullName").value.trim().replace(/\s+/g, "_");
+const frontPath = `aadhaar/${userName}_front`;
+const backPath = `aadhaar/${userName}_back`;
+
+  // FIX 2: error handling on uploads so button doesn't get stuck
+  const { error: frontError } = await supabaseClient.storage.from("documents").upload(frontPath, frontFile);
+  if (frontError) {
+    alert("Aadhaar front upload failed: " + frontError.message);
+    btn.disabled = false;
+    btn.innerText = "Confirm & Create";
+    return;
+  }
+
+  const { error: backError } = await supabaseClient.storage.from("documents").upload(backPath, backFile);
+  if (backError) {
+    alert("Aadhaar back upload failed: " + backError.message);
+    btn.disabled = false;
+    btn.innerText = "Confirm & Create";
+    return;
+  }
+
+  const selectedFarmTypes = Array.from(document.getElementById("farmType").selectedOptions).map(o => o.value);
+
+  // FIX 1: using updated ID userLocation
+  const { error: insertError } = await supabaseClient.from("profiles").insert({
+    id: userId,
+    role: "farmer",
+    username: document.getElementById("username").value,
+    full_name: document.getElementById("fullName").value,
+    mobile: document.getElementById("mobile").value,
+    age: parseInt(document.getElementById("age").value),
+    location: document.getElementById("userLocation").value,
+    farm_type: selectedFarmTypes,
+    crops: document.getElementById("crops").value,
+    aadhaar_front: frontPath,
+    aadhaar_back: backPath,
+    onboarding_completed: false
+  });
+
+  if (insertError) {
+    alert("Profile creation failed: " + insertError.message);
+    btn.disabled = false;
+    btn.innerText = "Confirm & Create";
+    return;
+  }
+
+  alert("Account created successfully!");
+  window.location.href = "login-farmer.html";
+}
 </script>
 
-
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
