@@ -54,7 +54,16 @@
     msg.innerHTML = `<span class="text-muted">Verifying...</span>`;
     try {
       await confirmationResult.confirm(otp);
-      await window._supabaseClient.from("profiles").update({ mobile, mobile_verified: true }).eq("id", window._currentUserId);
+      await fetch(`https://kyujketzdhkbykybjywu.supabase.co/rest/v1/profiles?id=eq.${window._currentUserId}`, {
+  method: "PATCH",
+  headers: {
+    "Content-Type": "application/json",
+    "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
+    "Prefer": "return=minimal"
+  },
+  body: JSON.stringify({ mobile: mobile, mobile_verified: true })
+});
       document.getElementById("displayMobile").innerText = mobile;
       document.getElementById("mobileVerifiedBadge").classList.remove("d-none");
       document.getElementById("mobileNotVerifiedBadge").classList.add("d-none");
@@ -85,7 +94,16 @@
     if (isSignInWithEmailLink(auth, window.location.href)) {
       try {
         await signInWithEmailLink(auth, email, window.location.href);
-        await window._supabaseClient.from("profiles").update({ email }).eq("id", window._currentUserId);
+        await fetch(`https://kyujketzdhkbykybjywu.supabase.co/rest/v1/profiles?id=eq.${window._currentUserId}`, {
+  method: "PATCH",
+  headers: {
+    "Content-Type": "application/json",
+    "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
+    "Prefer": "return=minimal"
+  },
+  body: JSON.stringify({ email: email })
+});
         document.getElementById("displayEmail").innerText = email;
         document.getElementById("emailVerifiedBadge").classList.remove("d-none");
         document.getElementById("emailNotVerifiedBadge").classList.add("d-none");
