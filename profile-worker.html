@@ -69,17 +69,19 @@
 
     try {
       await confirmationResult.confirm(otp);
-      // Save to Supabase
+      // FIX: use real Supabase session token, not anon key
+      const { data: { session: _sess } } = await window._supabaseClient.auth.getSession();
+      const _token = _sess?.access_token || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA";
       await fetch(`https://kyujketzdhkbykybjywu.supabase.co/rest/v1/profiles?id=eq.${window._currentUserId}`, {
-  method: "PATCH",
-  headers: {
-    "Content-Type": "application/json",
-    "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
-    "Prefer": "return=minimal"
-  },
-  body: JSON.stringify({ mobile: mobile, mobile_verified: true })
-});
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
+          "Authorization": `Bearer ${_token}`,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ mobile: mobile, mobile_verified: true })
+      });
 
       document.getElementById("displayMobile").innerText = mobile;
       document.getElementById("mobileVerifiedBadge").classList.remove("d-none");
@@ -129,16 +131,19 @@
     if (isSignInWithEmailLink(auth, window.location.href)) {
       try {
         await signInWithEmailLink(auth, email, window.location.href);
+        // FIX: use real Supabase session token, not anon key
+        const { data: { session: _sess } } = await window._supabaseClient.auth.getSession();
+        const _token = _sess?.access_token || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA";
         await fetch(`https://kyujketzdhkbykybjywu.supabase.co/rest/v1/profiles?id=eq.${window._currentUserId}`, {
-  method: "PATCH",
-  headers: {
-    "Content-Type": "application/json",
-    "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
-    "Prefer": "return=minimal"
-  },
-  body: JSON.stringify({ email: email })
-});
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
+            "Authorization": `Bearer ${_token}`,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({ email: email })
+        });
 
         document.getElementById("displayEmail").innerText = email;
         document.getElementById("emailVerifiedBadge").classList.remove("d-none");
@@ -552,7 +557,6 @@ async function loadProfile() {
   document.getElementById("crops").innerText = profile.crops || "—";
   document.getElementById("availability").innerText = profile.availability || "—";
 
-  // Contact details
   document.getElementById("displayMobile").innerText = profile.mobile || "Not set";
   document.getElementById("displayEmail").innerText = currentUser.email || "Not set";
 
@@ -562,8 +566,6 @@ async function loadProfile() {
     document.getElementById("mobileNotVerifiedBadge").classList.remove("d-none");
   }
 
-  // Email is verified if they signed up via Firebase email link
-  // For existing users, show as verified if email exists
   if (currentUser.email) {
     document.getElementById("emailVerifiedBadge").classList.remove("d-none");
   } else {
