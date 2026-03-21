@@ -69,15 +69,12 @@
 
     try {
       await confirmationResult.confirm(otp);
-      // FIX: use real Supabase session token, not anon key
-      const { data: { session: _sess } } = await window._supabaseClient.auth.getSession();
-      const _token = _sess?.access_token || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA";
       await fetch(`https://kyujketzdhkbykybjywu.supabase.co/rest/v1/profiles?id=eq.${window._currentUserId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
-          "Authorization": `Bearer ${_token}`,
+          "Authorization": `Bearer ${window._supabaseToken}`,
           "Prefer": "return=minimal"
         },
         body: JSON.stringify({ mobile: mobile, mobile_verified: true })
@@ -131,15 +128,12 @@
     if (isSignInWithEmailLink(auth, window.location.href)) {
       try {
         await signInWithEmailLink(auth, email, window.location.href);
-        // FIX: use real Supabase session token, not anon key
-        const { data: { session: _sess } } = await window._supabaseClient.auth.getSession();
-        const _token = _sess?.access_token || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA";
         await fetch(`https://kyujketzdhkbykybjywu.supabase.co/rest/v1/profiles?id=eq.${window._currentUserId}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
-            "Authorization": `Bearer ${_token}`,
+            "Authorization": `Bearer ${window._supabaseToken}`,
             "Prefer": "return=minimal"
           },
           body: JSON.stringify({ email: email })
@@ -539,6 +533,7 @@ async function loadProfile() {
   if (!session?.user) { location.href = "login-worker.html"; return; }
   currentUser = session.user;
   window._currentUserId = currentUser.id;
+  window._supabaseToken = session.access_token; // stored before any Firebase interaction
 
   const { data: profile, error } = await supabaseClient
     .from("profiles")
