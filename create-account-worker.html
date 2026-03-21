@@ -8,8 +8,206 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDaQE2LyBRc--nCPIdn75HNuyrYkj7BJIc",
+      authDomain: "kisan-setu-958ed.firebaseapp.com",
+      projectId: "kisan-setu-958ed",
+      appId: "1:831840844933:web:d095ce317e0a739a45bdec"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    auth.languageCode = 'en';
+
+    let confirmationResult = null;
+    window.mobileVerified = false;
+    window.emailVerified = false;
+
+    // ── MOBILE OTP ──────────────────────────────────────────
+    window.sendMobileOtp = async function () {
+      const mobile = document.getElementById("mobile").value.trim();
+      const mobileMsg = document.getElementById("mobileMsg");
+      const btn = document.getElementById("sendMobileOtpBtn");
+
+      if (!/^[0-9]{10}$/.test(mobile)) {
+        mobileMsg.innerHTML = `<span class="text-danger">Please enter a valid 10-digit mobile number.</span>`;
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Sending...";
+      mobileMsg.innerHTML = `<span class="text-muted">Sending OTP...</span>`;
+
+      try {
+        if (!window.recaptchaVerifier) {
+          window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            size: 'invisible',
+            callback: () => {}
+          });
+        }
+
+        confirmationResult = await signInWithPhoneNumber(auth, "+91" + mobile, window.recaptchaVerifier);
+
+        document.getElementById("mobileOtpPanel").classList.remove("d-none");
+        mobileMsg.innerHTML = `<span class="text-success">✓ OTP sent to +91${mobile}</span>`;
+        btn.innerText = "Resend OTP";
+        btn.disabled = false;
+
+      } catch (err) {
+        console.error(err);
+        mobileMsg.innerHTML = `<span class="text-danger">${err.message || "Failed to send OTP"}</span>`;
+        btn.innerText = "Send OTP";
+        btn.disabled = false;
+        if (window.recaptchaVerifier) {
+          window.recaptchaVerifier.clear();
+          window.recaptchaVerifier = null;
+        }
+      }
+    };
+
+    window.verifyMobileOtp = async function () {
+      const otp = document.getElementById("mobileOtpInput").value.trim();
+      const otpMsg = document.getElementById("mobileOtpMsg");
+
+      if (otp.length !== 6) {
+        otpMsg.innerHTML = `<span class="text-danger">Please enter a 6-digit OTP.</span>`;
+        return;
+      }
+
+      otpMsg.innerHTML = `<span class="text-muted">Verifying...</span>`;
+
+      try {
+        await confirmationResult.confirm(otp);
+        window.mobileVerified = true;
+        document.getElementById("mobileOtpPanel").classList.add("d-none");
+        document.getElementById("mobileVerifiedBadge").classList.remove("d-none");
+        document.getElementById("sendMobileOtpBtn").disabled = true;
+        document.getElementById("mobile").readOnly = true;
+        otpMsg.innerHTML = "";
+      } catch (err) {
+        otpMsg.innerHTML = `<span class="text-danger">Invalid OTP. Please try again.</span>`;
+      }
+    };
+
+    // ── EMAIL OTP ──────────────────────────────────────────
+    window.sendEmailOtp = async function () {
+      const email = document.getElementById("email").value.trim();
+      const emailMsg = document.getElementById("emailMsg");
+      const btn = document.getElementById("sendEmailOtpBtn");
+
+      if (!email || !/\S+@\S+\.\S+/.test(email)) {
+        emailMsg.innerHTML = `<span class="text-danger">Please enter a valid email address.</span>`;
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Sending...";
+      emailMsg.innerHTML = `<span class="text-muted">Sending OTP...</span>`;
+
+      // Generate 6-digit OTP and store it
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      window._emailOtp = otp;
+      window._emailOtpExpiry = Date.now() + 10 * 60 * 1000;
+
+      // Use Firebase email link auth to send a custom OTP email
+      // Since Firebase email link doesn't support custom OTP, we use actionCodeSettings
+      // and send via a workaround: store OTP in memory and use Firebase to verify email ownership
+      const actionCodeSettings = {
+        url: window.location.href,
+        handleCodeInApp: true,
+      };
+
+      try {
+        await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+        window.localStorage.setItem('emailForSignIn', email);
+
+        document.getElementById("emailOtpPanel").classList.remove("d-none");
+        emailMsg.innerHTML = `<span class="text-success">✓ Verification link sent to ${email}. Click the link in your email, then come back and click "I've Verified My Email".</span>`;
+        btn.innerText = "Resend";
+        btn.disabled = false;
+
+      } catch (err) {
+        console.error(err);
+        emailMsg.innerHTML = `<span class="text-danger">${err.message || "Failed to send email"}</span>`;
+        btn.innerText = "Send OTP";
+        btn.disabled = false;
+      }
+    };
+
+    window.confirmEmailVerified = async function () {
+      const emailMsg = document.getElementById("emailMsg");
+      const email = document.getElementById("email").value.trim();
+
+      // Check if current URL is a sign-in link (user came back after clicking email link)
+      if (isSignInWithEmailLink(auth, window.location.href)) {
+        try {
+          await signInWithEmailLink(auth, email, window.location.href);
+          window.emailVerified = true;
+          document.getElementById("emailOtpPanel").classList.add("d-none");
+          document.getElementById("emailVerifiedBadge").classList.remove("d-none");
+          document.getElementById("sendEmailOtpBtn").disabled = true;
+          document.getElementById("email").readOnly = true;
+          emailMsg.innerHTML = "";
+          // Clean URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (err) {
+          emailMsg.innerHTML = `<span class="text-danger">Verification failed. Please try again.</span>`;
+        }
+      } else {
+        emailMsg.innerHTML = `<span class="text-danger">Please click the link in your email first, then come back and click this button.</span>`;
+      }
+    };
+
+    // Auto-check if user came back from email link
+    window.addEventListener('load', async () => {
+      if (isSignInWithEmailLink(auth, window.location.href)) {
+        const email = window.localStorage.getItem('emailForSignIn');
+        if (email) {
+          document.getElementById("email").value = email;
+          document.getElementById("emailOtpPanel").classList.remove("d-none");
+          document.getElementById("emailMsg").innerHTML = `<span class="text-success">✓ Email link detected! Click "I've Verified My Email" to complete.</span>`;
+        }
+      }
+    });
+  </script>
+
   <link rel="stylesheet" href="Home.css">
   <link rel="stylesheet" href="auth.css">
+
+  <style>
+    .otp-panel {
+      background: #f6fbf7;
+      border: 1.5px solid #c3e6cb;
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 8px;
+    }
+    .otp-panel h6 { color: #1a7a3c; font-weight: 700; }
+    .otp-input {
+      letter-spacing: 0.3em;
+      font-size: 1.2rem;
+      text-align: center;
+      font-weight: 700;
+    }
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e8f5ee;
+      color: #1a7a3c;
+      border: 1px solid #a8d5b5;
+      border-radius: 50px;
+      padding: 4px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+  </style>
 </head>
 
 <body>
@@ -20,27 +218,60 @@
   </div>
 </nav>
 
+<div id="recaptcha-container"></div>
+
 <section class="auth-section auth-bg">
   <div class="container d-flex justify-content-center">
     <div class="auth-card">
 
       <h2 class="fw-bold text-center mb-2">Create Landlord Account</h2>
-      <p class="text-muted text-center mb-4">
-        Complete your profile to connect with workers
-      </p>
+      <p class="text-muted text-center mb-4">Complete your profile to connect with workers</p>
 
       <form id="workerForm" novalidate>
 
         <h6 class="mb-3">Contact Details</h6>
 
+        <!-- MOBILE -->
         <div class="mb-3">
           <label class="form-label">Mobile Number</label>
-          <input type="tel" class="form-control" id="mobile" pattern="[0-9]{10}" maxlength="10" required>
+          <div class="input-group">
+            <input type="tel" class="form-control" id="mobile" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile number" required>
+            <button type="button" class="btn btn-outline-success" id="sendMobileOtpBtn" onclick="sendMobileOtp()">Send OTP</button>
+          </div>
+          <small id="mobileMsg" class="d-block mt-1"></small>
+          <div class="otp-panel d-none" id="mobileOtpPanel">
+            <h6>📱 Verify Mobile</h6>
+            <p class="text-muted small mb-3">Enter the 6-digit OTP sent to your number.</p>
+            <div class="mb-3">
+              <input type="text" class="form-control otp-input" id="mobileOtpInput" maxlength="6" placeholder="• • • • • •">
+            </div>
+            <button type="button" class="btn btn-success w-100" onclick="verifyMobileOtp()">Verify OTP</button>
+            <div class="text-center mt-2">
+              <button type="button" class="btn btn-link btn-sm text-muted" onclick="sendMobileOtp()">Resend OTP</button>
+            </div>
+            <div id="mobileOtpMsg" class="small mt-2 text-center"></div>
+          </div>
+          <div class="d-none" id="mobileVerifiedBadge">
+            <span class="verified-badge">✅ Mobile Verified</span>
+          </div>
         </div>
 
+        <!-- EMAIL -->
         <div class="mb-3">
           <label class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" required>
+          <div class="input-group">
+            <input type="email" class="form-control" id="email" required>
+            <button type="button" class="btn btn-outline-success" id="sendEmailOtpBtn" onclick="sendEmailOtp()">Verify Email</button>
+          </div>
+          <small id="emailMsg" class="d-block mt-1"></small>
+          <div class="otp-panel d-none" id="emailOtpPanel">
+            <h6>📧 Verify Email</h6>
+            <p class="text-muted small mb-2">We sent a verification link to your email. Click it, then come back here.</p>
+            <button type="button" class="btn btn-success w-100" onclick="confirmEmailVerified()">✓ I've Verified My Email</button>
+          </div>
+          <div class="d-none" id="emailVerifiedBadge">
+            <span class="verified-badge">✅ Email Verified</span>
+          </div>
         </div>
 
         <h6 class="mb-3 mt-4">Login Credentials</h6>
@@ -60,7 +291,6 @@
 
         <div class="mb-3">
           <label class="form-label">Full Name</label>
-          <!-- FIX 1: renamed id from "name" to "fullName" -->
           <input type="text" class="form-control" id="fullName" required>
         </div>
 
@@ -71,7 +301,6 @@
 
         <div class="mb-3">
           <label class="form-label">Landlord Location</label>
-          <!-- FIX 2: renamed id from "location" to "userLocation" -->
           <input type="text" class="form-control" id="userLocation" required>
         </div>
 
@@ -130,11 +359,10 @@
         </div>
 
         <button type="button" class="btn btn-success w-100" onclick="showReview()">
-          Create Account
+          Review & Create Account
         </button>
 
       </form>
-
     </div>
   </div>
 </section>
@@ -143,32 +371,28 @@
 <div class="modal fade" id="reviewModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
-
       <div class="modal-header">
         <h5 class="modal-title">Review Your Details</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
       <div class="modal-body">
         <ul class="list-group list-group-flush">
           <li class="list-group-item"><strong>Name:</strong> <span id="rName"></span></li>
           <li class="list-group-item"><strong>Username:</strong> <span id="rUsername"></span></li>
-          <li class="list-group-item"><strong>Email:</strong> <span id="rEmail"></span></li>
-          <li class="list-group-item"><strong>Mobile:</strong> <span id="rMobile"></span></li>
+          <li class="list-group-item"><strong>Email:</strong> <span id="rEmail"></span> <span class="badge bg-success ms-1">Verified</span></li>
+          <li class="list-group-item"><strong>Mobile:</strong> <span id="rMobile"></span> <span class="badge bg-success ms-1">Verified</span></li>
           <li class="list-group-item"><strong>Location:</strong> <span id="rLocation"></span></li>
           <li class="list-group-item"><strong>Land Location:</strong> <span id="rLandLocation"></span></li>
           <li class="list-group-item"><strong>Farm Type:</strong> <span id="rWork"></span></li>
-          <li class="list-group-item"><strong>Land Size:</strong> <span id="rLandSize"></span></li>
+          <li class="list-group-item"><strong>Land Size:</strong> <span id="rLandSize"></span> acres</li>
           <li class="list-group-item"><strong>Work Needed:</strong> <span id="rWorkNeeded"></span></li>
-          <li class="list-group-item"><strong>Budget:</strong> ₹<span id="rBudget"></span></li>
+          <li class="list-group-item"><strong>Budget:</strong> ₹<span id="rBudget"></span>/day</li>
         </ul>
       </div>
-
       <div class="modal-footer">
         <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Edit</button>
         <button class="btn btn-success" onclick="confirmCreateWorker(event)">Confirm & Create</button>
       </div>
-
     </div>
   </div>
 </div>
@@ -184,7 +408,6 @@ let usernameAvailable = false;
 async function checkUsernameAvailability() {
   const uname = document.getElementById("username").value.trim();
   const status = document.getElementById("usernameStatus");
-
   if (!uname) return;
 
   const { data } = await supabaseClient
@@ -205,12 +428,19 @@ async function checkUsernameAvailability() {
 }
 
 function showReview() {
+  if (!window.mobileVerified) {
+    alert("Please verify your mobile number first.");
+    return;
+  }
+  if (!window.emailVerified) {
+    alert("Please verify your email address first.");
+    return;
+  }
   if (!workerForm.checkValidity()) {
     workerForm.reportValidity();
     return;
   }
 
-  // FIX 1 & 2: using updated IDs fullName and userLocation
   rName.textContent = document.getElementById("fullName").value;
   rUsername.textContent = document.getElementById("username").value;
   rEmail.textContent = document.getElementById("email").value;
@@ -242,14 +472,13 @@ async function confirmCreateWorker(event) {
     return;
   }
 
+  const userId = data.user.id;
   const frontFile = document.getElementById("aadhaarFront").files[0];
   const backFile = document.getElementById("aadhaarBack").files[0];
+  const userName = document.getElementById("fullName").value.trim().replace(/\s+/g, "_");
+  const frontPath = `aadhaar/${userName}_front`;
+  const backPath = `aadhaar/${userName}_back`;
 
-const userName = document.getElementById("fullName").value.trim().replace(/\s+/g, "_");
-const frontPath = `aadhaar/${userName}_front`;
-const backPath = `aadhaar/${userName}_back`;
-
-  // FIX 3: error handling on uploads so button doesn't get stuck
   const { error: frontError } = await supabaseClient.storage.from("documents").upload(frontPath, frontFile);
   if (frontError) {
     alert("Aadhaar front upload failed: " + frontError.message);
@@ -266,13 +495,13 @@ const backPath = `aadhaar/${userName}_back`;
     return;
   }
 
-  // FIX 1 & 2: using updated IDs fullName and userLocation
   const { error: insertError } = await supabaseClient.from("profiles").insert({
-    id: data.user.id,
+    id: userId,
     role: "worker",
     username: document.getElementById("username").value,
     full_name: document.getElementById("fullName").value,
     mobile: document.getElementById("mobile").value,
+    mobile_verified: true,
     age: parseInt(document.getElementById("age").value),
     location: document.getElementById("userLocation").value,
     work_type: document.getElementById("work").value,
@@ -292,12 +521,11 @@ const backPath = `aadhaar/${userName}_back`;
     return;
   }
 
-  alert("Account created!");
+  alert("Account created successfully!");
   window.location.href = "login-worker.html";
 }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
