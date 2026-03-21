@@ -91,80 +91,29 @@
   };
 
   // ── EMAIL EDIT & VERIFY ───────────────────────────────
-  window.sendEmailVerification = async function () {
+  window.saveEmail = async function () {
     const email = document.getElementById("editEmailInput").value.trim();
     const msg = document.getElementById("editEmailMsg");
     const btn = document.getElementById("sendEmailVerifyBtn");
-
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      msg.innerHTML = `<span class="text-danger">Enter a valid email.</span>`;
-      return;
-    }
-
-    btn.disabled = true;
-    btn.innerText = "Sending...";
-    msg.innerHTML = `<span class="text-muted">Sending verification email...</span>`;
-
-    const actionCodeSettings = { url: window.location.href, handleCodeInApp: true };
-
-    try {
-      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-      window.localStorage.setItem('emailForSignIn', email);
-      document.getElementById("emailConfirmRow").classList.remove("d-none");
-      msg.innerHTML = `<span class="text-success">✓ Verification link sent to ${email}. Click it then come back.</span>`;
-      btn.innerText = "Resend";
-      btn.disabled = false;
-    } catch (err) {
-      msg.innerHTML = `<span class="text-danger">${err.message}</span>`;
-      btn.innerText = "Send Verification";
-      btn.disabled = false;
-    }
+    if (!email || !/\S+@\S+\.\S+/.test(email)) { msg.innerHTML = `<span class="text-danger">Enter a valid email.</span>`; return; }
+    btn.disabled = true; btn.innerText = "Saving...";
+    await fetch(`https://kyujketzdhkbykybjywu.supabase.co/rest/v1/profiles?id=eq.${window._currentUserId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
+        "Authorization": `Bearer ${window._supabaseToken}`,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({ email: email })
+    });
+    document.getElementById("displayEmail").innerText = email;
+    document.getElementById("emailVerifiedBadge").classList.remove("d-none");
+    document.getElementById("emailNotVerifiedBadge").classList.add("d-none");
+    document.getElementById("editEmailSection").classList.add("d-none");
+    msg.innerHTML = "";
+    btn.disabled = false; btn.innerText = "Save";
   };
-
-  window.confirmEmailVerified = async function () {
-    const email = document.getElementById("editEmailInput").value.trim();
-    const msg = document.getElementById("editEmailMsg");
-
-    if (isSignInWithEmailLink(auth, window.location.href)) {
-      try {
-        await signInWithEmailLink(auth, email, window.location.href);
-        await fetch(`https://kyujketzdhkbykybjywu.supabase.co/rest/v1/profiles?id=eq.${window._currentUserId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
-            "Authorization": `Bearer ${window._supabaseToken}`,
-            "Prefer": "return=minimal"
-          },
-          body: JSON.stringify({ email: email })
-        });
-
-        document.getElementById("displayEmail").innerText = email;
-        document.getElementById("emailVerifiedBadge").classList.remove("d-none");
-        document.getElementById("emailNotVerifiedBadge").classList.add("d-none");
-        document.getElementById("editEmailSection").classList.add("d-none");
-        msg.innerHTML = "";
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } catch (err) {
-        msg.innerHTML = `<span class="text-danger">Verification failed. Try again.</span>`;
-      }
-    } else {
-      msg.innerHTML = `<span class="text-danger">Please click the email link first.</span>`;
-    }
-  };
-
-  // Auto-detect email link return
-  window.addEventListener('load', async () => {
-    if (isSignInWithEmailLink(auth, window.location.href)) {
-      const email = window.localStorage.getItem('emailForSignIn');
-      if (email) {
-        document.getElementById("editEmailInput").value = email;
-        document.getElementById("editEmailSection").classList.remove("d-none");
-        document.getElementById("emailConfirmRow").classList.remove("d-none");
-        document.getElementById("editEmailMsg").innerHTML = `<span class="text-success">✓ Email link detected! Click confirm below.</span>`;
-      }
-    }
-  });
 </script>
 
 <link rel="stylesheet" href="Home.css">
@@ -413,10 +362,7 @@
           <label>New Email Address</label>
           <div class="input-group mb-2">
             <input type="email" class="form-control form-control-sm" id="editEmailInput" placeholder="new@email.com">
-            <button class="btn btn-sm btn-success" id="sendEmailVerifyBtn" onclick="sendEmailVerification()">Send Link</button>
-          </div>
-          <div id="emailConfirmRow" class="d-none mb-2">
-            <button class="btn btn-sm btn-success w-100" onclick="confirmEmailVerified()">✓ I've Clicked the Email Link</button>
+            <button class="btn btn-sm btn-success" id="sendEmailVerifyBtn" onclick="saveEmail()">Save</button>
           </div>
           <small id="editEmailMsg"></small>
           <button class="btn btn-sm btn-outline-secondary mt-1" onclick="toggleEditEmail()">Cancel</button>
