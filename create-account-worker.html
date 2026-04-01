@@ -125,6 +125,55 @@
       font-weight: 600;
       margin-top: 6px;
     }
+    #successOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.97);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 30px;
+    }
+    #successOverlay.show { display: flex; }
+    .success-icon {
+      font-size: 5rem;
+      animation: popIn 0.5s ease;
+    }
+    .success-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1a7a3c;
+      margin-top: 16px;
+    }
+    .success-sub {
+      color: #555;
+      margin-top: 8px;
+      font-size: 1rem;
+    }
+    .success-countdown {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #888;
+    }
+    .success-btn {
+      margin-top: 24px;
+      padding: 10px 32px;
+      background: #1a7a3c;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .success-btn:hover { background: #155f30; }
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 
@@ -137,6 +186,15 @@
 </nav>
 
 <div id="recaptcha-container"></div>
+
+<!-- SUCCESS OVERLAY -->
+<div id="successOverlay">
+  <div class="success-icon">✅</div>
+  <div class="success-title">Account Created Successfully!</div>
+  <div class="success-sub">Welcome to Kisan Setu, <strong id="successName"></strong>.</div>
+  <div class="success-countdown" id="successCountdown">Redirecting to login in 3 seconds...</div>
+  <button class="success-btn" onclick="window.location.href='login-worker.html'">Go to Login →</button>
+</div>
 
 <section class="auth-section auth-bg">
   <div class="container d-flex justify-content-center">
@@ -405,7 +463,6 @@ async function confirmCreateWorker(event) {
     full_name: document.getElementById("fullName").value,
     mobile: document.getElementById("mobile").value,
     mobile_verified: true,
-    email: document.getElementById("email").value,
     age: parseInt(document.getElementById("age").value),
     location: document.getElementById("userLocation").value,
     work_type: document.getElementById("work").value,
@@ -425,8 +482,18 @@ async function confirmCreateWorker(event) {
     return;
   }
 
-  alert("Account created successfully!");
-  window.location.href = "login-worker.html";
+  document.getElementById("successName").textContent = document.getElementById("fullName").value;
+  document.getElementById("successOverlay").classList.add("show");
+  let seconds = 3;
+  const countdownEl = document.getElementById("successCountdown");
+  const timer = setInterval(() => {
+    seconds--;
+    countdownEl.textContent = `Redirecting to login in ${seconds} second${seconds !== 1 ? 's' : ''}...`;
+    if (seconds <= 0) {
+      clearInterval(timer);
+      window.location.href = "login-worker.html";
+    }
+  }, 1000);
 }
 </script>
 
