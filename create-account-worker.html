@@ -183,6 +183,7 @@
 
         <h6 class="mb-3">Contact Details</h6>
 
+        <!-- MOBILE -->
         <div class="mb-3">
           <label class="form-label">Mobile Number</label>
           <div class="input-group">
@@ -207,23 +208,27 @@
           </div>
         </div>
 
+        <!-- EMAIL -->
         <div class="mb-3">
           <label class="form-label">Email</label>
           <input type="email" class="form-control" id="email" required>
           <small id="emailMsg" class="d-block mt-1"></small>
         </div>
 
-        <h6 class="mb-3 mt-4">Login Credentials</h6>
+        <!-- LOGIN CREDENTIALS — hidden for Google users -->
+        <div id="credentialsSection">
+          <h6 class="mb-3 mt-4">Login Credentials</h6>
 
-        <div class="mb-1">
-          <label class="form-label">Username</label>
-          <input type="text" class="form-control" id="username" required onblur="checkUsernameAvailability()">
-          <small id="usernameStatus" class="d-block mt-1"></small>
-        </div>
+          <div class="mb-1">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" onblur="checkUsernameAvailability()">
+            <small id="usernameStatus" class="d-block mt-1"></small>
+          </div>
 
-        <div class="mb-3 mt-3">
-          <label class="form-label">Password</label>
-          <input type="password" class="form-control" id="password" minlength="6" required>
+          <div class="mb-3 mt-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" minlength="6">
+          </div>
         </div>
 
         <h6 class="mb-3 mt-4">Personal Details</h6>
@@ -317,7 +322,7 @@
       <div class="modal-body">
         <ul class="list-group list-group-flush">
           <li class="list-group-item"><strong>Name:</strong> <span id="rName"></span></li>
-          <li class="list-group-item"><strong>Username:</strong> <span id="rUsername"></span></li>
+          <li class="list-group-item" id="rUsernameRow"><strong>Username:</strong> <span id="rUsername"></span></li>
           <li class="list-group-item"><strong>Email:</strong> <span id="rEmail"></span></li>
           <li class="list-group-item"><strong>Mobile:</strong> <span id="rMobile"></span> <span class="badge bg-success ms-1">Verified</span></li>
           <li class="list-group-item"><strong>Location:</strong> <span id="rLocation"></span></li>
@@ -346,6 +351,28 @@ const supabaseClient = supabase.createClient(
 const isGoogle = new URLSearchParams(window.location.search).get("source") === "google";
 
 let usernameAvailable = false;
+
+// ✅ On page load: if Google user, auto-fill email (read-only) and hide credentials
+window.addEventListener("DOMContentLoaded", async () => {
+  if (isGoogle) {
+    // Hide username & password section entirely
+    document.getElementById("credentialsSection").style.display = "none";
+
+    // Auto-fill email from Google session and make it read-only
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (user?.email) {
+      const emailInput = document.getElementById("email");
+      emailInput.value = user.email;
+      emailInput.readOnly = true;
+      emailInput.style.backgroundColor = "#f8f9fa";
+      emailInput.style.cursor = "not-allowed";
+    }
+
+    // Remove required from username/password since they're hidden
+    document.getElementById("username").removeAttribute("required");
+    document.getElementById("password").removeAttribute("required");
+  }
+});
 
 async function checkUsernameAvailability() {
   const uname = document.getElementById("username").value.trim();
@@ -380,7 +407,7 @@ function showReview() {
   }
 
   rName.textContent = document.getElementById("fullName").value;
-  rUsername.textContent = document.getElementById("username").value;
+  rUsername.textContent = isGoogle ? "—" : document.getElementById("username").value;
   rEmail.textContent = document.getElementById("email").value;
   rMobile.textContent = document.getElementById("mobile").value;
   rLocation.textContent = document.getElementById("userLocation").value;
@@ -389,6 +416,9 @@ function showReview() {
   rLandSize.textContent = document.getElementById("landSize").value;
   rWorkNeeded.textContent = document.getElementById("workNeeded").value;
   rBudget.textContent = document.getElementById("budget").value;
+
+  // Hide username row in review for Google users
+  document.getElementById("rUsernameRow").style.display = isGoogle ? "none" : "";
 
   new bootstrap.Modal(document.getElementById("reviewModal")).show();
 }
@@ -401,7 +431,7 @@ async function confirmCreateWorker(event) {
   let userId;
 
   if (isGoogle) {
-    // ✅ Google user — auth account already exists, just get their ID
+    // ✅ Google user — auth account already exists, get their ID from session
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) {
       alert("Session expired. Please sign in again.");
@@ -411,7 +441,7 @@ async function confirmCreateWorker(event) {
     }
     userId = user.id;
   } else {
-    // Normal username/password signup — unchanged
+    // Normal username/password signup — completely unchanged
     const { data, error } = await supabaseClient.auth.signUp({
       email: document.getElementById("email").value,
       password: document.getElementById("password").value
@@ -427,6 +457,7 @@ async function confirmCreateWorker(event) {
     userId = data.user.id;
   }
 
+  // ── Aadhaar upload — unchanged ──────────────────────────
   const frontFile = document.getElementById("aadhaarFront").files[0];
   const backFile = document.getElementById("aadhaarBack").files[0];
   const userName = document.getElementById("fullName").value.trim().replace(/\s+/g, "_");
@@ -449,6 +480,7 @@ async function confirmCreateWorker(event) {
     return;
   }
 
+  // ── Build profile — id is always the auth.users id ──────
   const profileData = {
     id: userId,
     role: "worker",
@@ -467,6 +499,7 @@ async function confirmCreateWorker(event) {
     onboarding_completed: true
   };
 
+  // Username only saved for non-Google users
   if (!isGoogle) {
     profileData.username = document.getElementById("username").value;
   }
@@ -480,7 +513,7 @@ async function confirmCreateWorker(event) {
     return;
   }
 
-  // ✅ Redirect to dashboard for Google, login page for normal signup
+  // ✅ Google → dashboard, normal → login page
   const redirectTarget = isGoogle ? "profile-worker.html" : "login-worker.html";
   document.getElementById("successName").textContent = document.getElementById("fullName").value;
   document.getElementById("successBtn").textContent = isGoogle ? "Go to Dashboard →" : "Go to Login →";
