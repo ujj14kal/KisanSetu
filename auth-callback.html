@@ -150,7 +150,7 @@
   </div>
 </div>
 
-<!-- ROLE SELECTION MODAL — fallback only if no role hint -->
+<!-- ROLE SELECTION MODAL — fallback only if no role hint available -->
 <div class="modal fade" id="roleModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content rounded-4 p-3">
@@ -171,12 +171,13 @@
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA"
   );
 
-  const params = new URLSearchParams(window.location.search);
-  const roleHint = params.get("role"); // "farmer" | "worker" | null
+  // ✅ Read role hint from localStorage (set before OAuth redirect)
+  const roleHint = localStorage.getItem("ks_role_hint"); // "farmer" | "worker" | null
 
-  let pendingRole = null; // set before showing confirm, used on Continue
+  let pendingRole = null;
 
   async function handleAuth() {
+    const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     if (code) {
       const { error } = await supabaseClient.auth.exchangeCodeForSession(window.location.href);
@@ -199,7 +200,7 @@
       .eq("id", user.id)
       .maybeSingle();
 
-    // No profile row yet — brand new Google user
+    // ── No profile row yet (brand new Google user) ──────────────────
     if (!profile) {
       if (roleHint) {
         askConfirm(roleHint);
@@ -209,13 +210,14 @@
       return;
     }
 
-    // Profile exists but onboarding not finished
+    // ── Profile exists but onboarding not finished ───────────────────
     if (!profile.onboarding_completed) {
       askConfirm(profile.role);
       return;
     }
 
-    // Fully onboarded → dashboard
+    // ── Fully onboarded → dashboard (clear any leftover hint) ────────
+    localStorage.removeItem("ks_role_hint");
     if (profile.role === "farmer") {
       window.location.replace("profile-farmer.html");
     } else {
@@ -223,14 +225,13 @@
     }
   }
 
-  // ── Show the attractive confirm prompt ──────────────────────────────
   function askConfirm(role) {
     pendingRole = role;
-
     const isFarmer = role === "farmer";
-    document.getElementById("confirmEmoji").textContent  = isFarmer ? "🌾" : "🏡";
-    document.getElementById("confirmBadge").textContent  = isFarmer ? "Farmer" : "Landlord";
-    document.getElementById("confirmTitle").textContent  = isFarmer
+
+    document.getElementById("confirmEmoji").textContent = isFarmer ? "🌾" : "🏡";
+    document.getElementById("confirmBadge").textContent = isFarmer ? "Farmer" : "Landlord";
+    document.getElementById("confirmTitle").textContent = isFarmer
       ? "Creating a Farmer Account?"
       : "Creating a Landlord Account?";
     document.getElementById("confirmDesc").innerHTML = isFarmer
@@ -242,11 +243,15 @@
 
   function continueConfirm() {
     document.getElementById("confirmOverlay").classList.remove("show");
+    // ✅ Clear the hint now that we've used it
+    localStorage.removeItem("ks_role_hint");
     goToCompleteProfile(pendingRole);
   }
 
   function cancelConfirm() {
     document.getElementById("confirmOverlay").classList.remove("show");
+    // ✅ Clear hint on cancel too so it doesn't persist
+    localStorage.removeItem("ks_role_hint");
     window.location.replace("index.html");
   }
 

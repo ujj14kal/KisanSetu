@@ -5,24 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Landlord Login | Kisan Setu</title>
 
-  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml;utf8,
   <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
     <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='90'>🌾</text>
   </svg>">
 
-  <!-- Common Styles -->
   <link rel="stylesheet" href="Home.css">
   <link rel="stylesheet" href="auth.css">
-
-  
-
 </head>
 <body>
 
@@ -52,9 +44,7 @@
         <input type="password" class="form-control" id="password" placeholder="Password" required />
       </div>
 
-      <button class="btn btn-success w-100 mb-3" onclick="loginWithUsername()">
-        Login
-      </button>
+      <button class="btn btn-success w-100 mb-3" onclick="loginWithUsername()">Login</button>
 
       <div class="text-muted my-3">OR</div>
 
@@ -64,10 +54,8 @@
       </button>
 
       <p class="auth-footer-text mt-3">
-        Don’t have an account?
-        <a href="create-account-worker.html" class="fw-semibold">
-          Create Landlord Account
-        </a>
+        Don't have an account?
+        <a href="create-account-worker.html" class="fw-semibold">Create Landlord Account</a>
       </p>
 
     </div>
@@ -83,21 +71,21 @@
 
 <script>
   const { createClient } = supabase;
-
-  // ✅ FIX 1: Use ANON PUBLIC KEY (JWT)
   const supabaseClient = createClient(
     "https://kyujketzdhkbykybjywu.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA"
   );
 
   async function loginWithGoogle() {
+    // ✅ Store role in localStorage BEFORE redirect — Supabase drops query params
+    localStorage.setItem("ks_role_hint", "worker");
+
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: window.location.origin + "/auth-callback.html"
       }
     });
-
     if (error) alert(error.message);
   }
 
@@ -135,13 +123,5 @@
   }
 </script>
 
-
 </body>
 </html>
-
-
-
-
-
-
-
