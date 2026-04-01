@@ -176,8 +176,9 @@
   <div class="container d-flex justify-content-center">
     <div class="auth-card">
 
-      <h2 class="fw-bold text-center mb-2">Create Landlord Account</h2>
-      <p class="text-muted text-center mb-4">Complete your profile to connect with workers</p>
+      <!-- Heading changes based on Google vs normal flow -->
+      <h2 class="fw-bold text-center mb-2" id="pageHeading">Create Landlord Account</h2>
+      <p class="text-muted text-center mb-4" id="pageSubheading">Complete your profile to connect with workers.</p>
 
       <form id="workerForm" novalidate>
 
@@ -347,18 +348,22 @@ const supabaseClient = supabase.createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA"
 );
 
-// ✅ Detect Google flow
 const isGoogle = new URLSearchParams(window.location.search).get("source") === "google";
 
 let usernameAvailable = false;
 
-// ✅ On page load: if Google user, auto-fill email (read-only) and hide credentials
 window.addEventListener("DOMContentLoaded", async () => {
   if (isGoogle) {
-    // Hide username & password section entirely
-    document.getElementById("credentialsSection").style.display = "none";
+    // ✅ Update heading for Google flow
+    document.getElementById("pageHeading").textContent = "Complete Your Profile";
+    document.getElementById("pageSubheading").textContent = "Just a few more details to get you started.";
 
-    // Auto-fill email from Google session and make it read-only
+    // Hide username & password section
+    document.getElementById("credentialsSection").style.display = "none";
+    document.getElementById("username").removeAttribute("required");
+    document.getElementById("password").removeAttribute("required");
+
+    // Auto-fill email from Google session (read-only)
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (user?.email) {
       const emailInput = document.getElementById("email");
@@ -367,10 +372,6 @@ window.addEventListener("DOMContentLoaded", async () => {
       emailInput.style.backgroundColor = "#f8f9fa";
       emailInput.style.cursor = "not-allowed";
     }
-
-    // Remove required from username/password since they're hidden
-    document.getElementById("username").removeAttribute("required");
-    document.getElementById("password").removeAttribute("required");
   }
 });
 
@@ -417,7 +418,6 @@ function showReview() {
   rWorkNeeded.textContent = document.getElementById("workNeeded").value;
   rBudget.textContent = document.getElementById("budget").value;
 
-  // Hide username row in review for Google users
   document.getElementById("rUsernameRow").style.display = isGoogle ? "none" : "";
 
   new bootstrap.Modal(document.getElementById("reviewModal")).show();
@@ -431,7 +431,7 @@ async function confirmCreateWorker(event) {
   let userId;
 
   if (isGoogle) {
-    // ✅ Google user — auth account already exists, get their ID from session
+    // Google user — get ID from existing session
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) {
       alert("Session expired. Please sign in again.");
@@ -441,7 +441,7 @@ async function confirmCreateWorker(event) {
     }
     userId = user.id;
   } else {
-    // Normal username/password signup — completely unchanged
+    // Normal signup — unchanged
     const { data, error } = await supabaseClient.auth.signUp({
       email: document.getElementById("email").value,
       password: document.getElementById("password").value
@@ -457,7 +457,7 @@ async function confirmCreateWorker(event) {
     userId = data.user.id;
   }
 
-  // ── Aadhaar upload — unchanged ──────────────────────────
+  // Aadhaar upload — unchanged
   const frontFile = document.getElementById("aadhaarFront").files[0];
   const backFile = document.getElementById("aadhaarBack").files[0];
   const userName = document.getElementById("fullName").value.trim().replace(/\s+/g, "_");
@@ -480,7 +480,9 @@ async function confirmCreateWorker(event) {
     return;
   }
 
-  // ── Build profile — id is always the auth.users id ──────
+  // ✅ For Google users: INSERT a fresh profiles row (first time ever)
+  // ✅ For normal users: INSERT as before
+  // Both paths: only ONE insert, happens here for the first time
   const profileData = {
     id: userId,
     role: "worker",
@@ -499,7 +501,6 @@ async function confirmCreateWorker(event) {
     onboarding_completed: true
   };
 
-  // Username only saved for non-Google users
   if (!isGoogle) {
     profileData.username = document.getElementById("username").value;
   }
@@ -513,7 +514,7 @@ async function confirmCreateWorker(event) {
     return;
   }
 
-  // ✅ Google → dashboard, normal → login page
+  // Redirect
   const redirectTarget = isGoogle ? "profile-worker.html" : "login-worker.html";
   document.getElementById("successName").textContent = document.getElementById("fullName").value;
   document.getElementById("successBtn").textContent = isGoogle ? "Go to Dashboard →" : "Go to Login →";
