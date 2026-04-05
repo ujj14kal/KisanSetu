@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kisan Setu – Agricultural Info</title>
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='90'>🌾</text></svg>">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a7d3e;
+    --green-light: #e8f5e9;
+    --green-mid: #4caf50;
+    --amber: #ff8f00;
+    --brown: #6d4c41;
+    --sky: #0277bd;
+    --card-radius: 18px;
+    --transition: 0.35s cubic-bezier(.4,0,.2,1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f5f7f2; color: #1a2e1a; overflow-x: hidden; }
+
+  /* NAVBAR */
+  .navbar { background: #fff; box-shadow: 0 1px 8px rgba(0,0,0,.08); position: sticky; top: 0; z-index: 1000; }
+  .navbar-brand { font-weight: 700; color: var(--green) !important; font-size: 1.3rem; }
+  .nav-link { color: #333 !important; font-weight: 500; }
+  .nav-link:hover { color: var(--green) !important; }
+  .btn-success { background: var(--green); border-color: var(--green); }
+
+  /* HERO */
+  .info-hero {
+    background: linear-gradient(135deg, #1b5e20 0%, #33691e 40%, #558b2f 100%);
+    color: #fff;
+    padding: 80px 0 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .info-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .floating-icons { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; }
+  .fi { position: absolute; font-size: 2rem; opacity: 0.12; animation: floatIcon 8s infinite ease-in-out; }
+  .fi:nth-child(1) { left: 5%; top: 20%; animation-delay: 0s; }
+  .fi:nth-child(2) { left: 15%; top: 60%; animation-delay: 1s; }
+  .fi:nth-child(3) { left: 80%; top: 15%; animation-delay: 2s; }
+  .fi:nth-child(4) { left: 88%; top: 55%; animation-delay: 0.5s; }
+  .fi:nth-child(5) { left: 50%; top: 75%; animation-delay: 3s; }
+  .fi:nth-child(6) { left: 65%; top: 30%; animation-delay: 1.5s; }
+  @keyframes floatIcon {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(10deg); }
+  }
+  .info-hero h1 { font-size: 2.6rem; font-weight: 800; margin-bottom: 1rem; text-shadow: 0 2px 8px rgba(0,0,0,.3); }
+  .info-hero p { font-size: 1.15rem; opacity: 0.9; max-width: 600px; margin: 0 auto 2rem; }
+
+  /* SEARCH */
+  .search-box { max-width: 420px; margin: 0 auto; position: relative; }
+  .search-box input {
+    width: 100%; padding: 14px 50px 14px 20px;
+    border-radius: 50px; border: none;
+    font-size: 1rem; outline: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  }
+  .search-box span { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; }
+
+  /* REGION TABS */
+  .region-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 2rem 1rem 1rem; }
+  .region-tab {
+    padding: 8px 20px; border-radius: 50px; border: 2px solid var(--green);
+    background: #fff; color: var(--green); font-weight: 600; cursor: pointer;
+    transition: var(--transition); font-size: 0.9rem;
+  }
+  .region-tab:hover, .region-tab.active {
+    background: var(--green); color: #fff; transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26,125,62,.35);
+  }
+
+  /* STATES GRID */
+  .states-section { padding: 1rem 0 4rem; }
+  .states-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 1.5rem;
+  }
+
+  /* STATE CARD */
+  .state-card {
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    min-height: 160px;
+    display: flex; align-items: flex-end;
+    box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    transition: var(--transition);
+    background-size: cover; background-position: center;
+  }
+  .state-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 12px 32px rgba(0,0,0,.22); }
+  .state-card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,.7) 0%, rgba(0,0,0,.1) 60%, transparent 100%);
+    transition: var(--transition);
+  }
+  .state-card:hover .state-card-overlay { background: linear-gradient(0deg, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 70%, transparent 100%); }
+  .state-card-body { position: relative; z-index: 1; padding: 14px; width: 100%; }
+  .state-card-body h5 { color: #fff; font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+  .state-card-body .state-emoji { font-size: 1.5rem; margin-bottom: 6px; display: block; }
+  .crop-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+  .crop-pill {
+    background: rgba(255,255,255,.25); color: #fff;
+    padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+    backdrop-filter: blur(4px);
+  }
+  .state-hidden { display: none; }
+
+  /* MODAL */
+  .info-modal-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    overflow-y: auto;
+  }
+  .info-modal-overlay.open { opacity: 1; pointer-events: all; }
+  .info-modal {
+    background: #fff; border-radius: 24px;
+    width: 100%; max-width: 800px;
+    overflow: hidden;
+    transform: translateY(40px) scale(0.96);
+    transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+    margin: auto;
+    box-shadow: 0 24px 60px rgba(0,0,0,.3);
+  }
+  .info-modal-overlay.open .info-modal { transform: translateY(0) scale(1); }
+
+  .modal-hero {
+    height: 220px; position: relative;
+    background-size: cover; background-position: center;
+    display: flex; align-items: flex-end;
+  }
+  .modal-hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,.1) 60%);
+  }
+  .modal-hero-body { position: relative; z-index: 1; padding: 24px; width: 100%; }
+  .modal-hero-body h2 { color: #fff; font-size: 1.9rem; font-weight: 800; }
+  .modal-hero-body .modal-region { color: rgba(255,255,255,.8); font-size: 0.95rem; margin-top: 4px; }
+
+  .modal-close {
+    position: absolute; top: 14px; right: 14px; z-index: 10;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,.2); border: none; color: #fff;
+    font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px); transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,.4); }
+
+  .modal-body-inner { padding: 28px; }
+
+  .info-section-title {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--green); margin-bottom: 12px; margin-top: 24px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .info-section-title::after { content: ''; flex: 1; height: 1px; background: #e0e0e0; }
+
+  .info-card {
+    background: var(--green-light); border-radius: 14px;
+    padding: 16px 20px; margin-bottom: 14px;
+  }
+  .info-card h6 { font-weight: 700; color: var(--green); margin-bottom: 6px; font-size: 0.9rem; }
+  .info-card p { color: #333; font-size: 0.9rem; line-height: 1.6; margin: 0; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .stat-chip {
+    background: #fff; border: 1.5px solid #e0e0e0; border-radius: 12px;
+    padding: 14px 12px; text-align: center;
+  }
+  .stat-chip .stat-val { font-size: 1.4rem; font-weight: 800; color: var(--green); }
+  .stat-chip .stat-lbl { font-size: 0.72rem; color: #666; margin-top: 2px; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    padding: 5px 14px; border-radius: 50px; font-size: 0.82rem; font-weight: 600;
+  }
+  .tag-green { background: #e8f5e9; color: #1b5e20; }
+  .tag-amber { background: #fff8e1; color: #e65100; }
+  .tag-blue { background: #e3f2fd; color: #01579b; }
+  .tag-brown { background: #efebe9; color: #4e342e; }
+
+  .soil-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+  .soil-chip {
+    border-radius: 12px; padding: 8px 16px; font-size: 0.82rem; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .soil-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+  .music-bar {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+    border-radius: 14px; padding: 14px 18px;
+    display: flex; align-items: center; gap: 14px; margin-bottom: 14px;
+    color: #fff;
+  }
+  .music-icon { font-size: 1.8rem; }
+  .music-info h6 { font-weight: 700; margin-bottom: 2px; font-size: 0.9rem; }
+  .music-info p { font-size: 0.78rem; opacity: 0.85; margin: 0; }
+  .music-wave { display: flex; gap: 3px; align-items: center; margin-left: auto; }
+  .wave-bar {
+    width: 4px; background: rgba(255,255,255,.6); border-radius: 4px;
+    animation: wavePulse 1s infinite ease-in-out;
+  }
+  .wave-bar:nth-child(1) { height: 8px; animation-delay: 0s; }
+  .wave-bar:nth-child(2) { height: 20px; animation-delay: 0.15s; }
+  .wave-bar:nth-child(3) { height: 14px; animation-delay: 0.3s; }
+  .wave-bar:nth-child(4) { height: 24px; animation-delay: 0.1s; }
+  .wave-bar:nth-child(5) { height: 10px; animation-delay: 0.25s; }
+  @keyframes wavePulse {
+    0%, 100% { transform: scaleY(1); opacity: 0.6; }
+    50% { transform: scaleY(1.8); opacity: 1; }
+  }
+
+  /* Scroll animation */
+  .state-card { animation: cardIn 0.4s ease both; }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Animated background gradient on modal hero */
+  @keyframes bgShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+  /* Responsive */
+  @media(max-width: 576px) {
+    .info-hero h1 { font-size: 1.8rem; }
+    .states-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; padding: 1rem; }
+    .modal-body-inner { padding: 16px; }
+  }
+
+  .no-results { text-align: center; padding: 4rem 1rem; color: #999; display: none; }
+  .no-results.show { display: block; }
+
+  footer { background: #1b5e20; color: rgba(255,255,255,.85); text-align: center; padding: 1.5rem; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-success" href="index.html">🌾 Kisan Setu</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="support.html">Support</a></li>
+        <li class="nav-item"><a class="nav-link" href="process.html">Process</a></li>
+        <li class="nav-item"><a class="nav-link active fw-bold text-success" href="info.html">Info</a></li>
+        <li class="nav-item dropdown ms-lg-3">
+          <a class="btn btn-success px-4 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Login</a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="login-farmer.html">🌾 Login as Farmer</a></li>
+            <li><a class="dropdown-item" href="login-worker.html">👩‍🌾 Login as Landlord</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="info-hero">
+  <div class="floating-icons">
+    <span class="fi">🌾</span><span class="fi">🌱</span><span class="fi">🚜</span>
+    <span class="fi">🌿</span><span class="fi">🏞️</span><span class="fi">☀️</span>
+  </div>
+  <div class="container position-relative">
+    <h1>🗺️ Agricultural India</h1>
+    <p>Explore soil types, crops, climate, and farming traditions — state by state, for every Indian farmer.</p>
+    <div class="search-box">
+      <input type="text" id="stateSearch" placeholder="Search a state… e.g. Punjab, Kerala" />
+      <span>🔍</span>
+    </div>
+  </div>
+</section>
+
+<!-- REGION FILTER TABS -->
+<div class="container">
+  <div class="region-tabs">
+    <div class="region-tab active" data-region="all">All States</div>
+    <div class="region-tab" data-region="north">North India</div>
+    <div class="region-tab" data-region="south">South India</div>
+    <div class="region-tab" data-region="east">East India</div>
+    <div class="region-tab" data-region="west">West India</div>
+    <div class="region-tab" data-region="central">Central India</div>
+    <div class="region-tab" data-region="northeast">Northeast India</div>
+  </div>
+</div>
+
+<!-- STATES GRID -->
+<section class="states-section">
+  <div class="container">
+    <div class="states-grid" id="statesGrid"></div>
+    <div class="no-results" id="noResults">😕 No states found matching your search.</div>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div class="info-modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="info-modal" id="infoModal">
+    <div class="modal-hero" id="modalHero">
+      <div class="modal-hero-overlay"></div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      <div class="modal-hero-body">
+        <h2 id="modalTitle">State Name</h2>
+        <div class="modal-region" id="modalRegion">Region • India</div>
+      </div>
+    </div>
+    <div class="modal-body-inner" id="modalBody"></div>
+  </div>
+</div>
+
+<footer>© 2026 Kisan Setu. All rights reserved. &nbsp;|&nbsp; 🌾 <strong>Kisan Setu</strong></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+// ========== STATE DATA ==========
+const STATES = [
+  {
+    id: "punjab",
+    name: "Punjab",
+    region: "north",
+    emoji: "🌾",
+    bg: "https://images.unsplash.com/photo-1625467097988-f06b9930a10a?w=800&q=70",
+    color: "#f9a825",
+    music: "Bhangra — Dhol beats of the harvest",
+    musicNote: "Bhangra rhythm plays as you enter Punjab's golden fields",
+    rainfall: "600–700 mm",
+    area: "50,362 km²",
+    climate: "Semi-arid to sub-humid; hot summers, cold winters",
+    soils: [
+      { name: "Alluvial", color: "#d4a373", desc: "Highly fertile Indo-Gangetic plains soil, rich in nutrients — ideal for wheat and rice cultivation." },
+      { name: "Sandy loam", color: "#c9b99a", desc: "Found in south-west districts; well-drained, suits cotton and vegetables." }
+    ],
+    crops: {
+      kharif: ["Rice (Paddy)", "Maize", "Cotton", "Bajra"],
+      rabi: ["Wheat", "Mustard", "Barley", "Chickpea"],
+      other: ["Sugarcane", "Sunflower", "Potato"]
+    },
+    highlights: "Called the 'Granary of India' — Punjab produces ~16% of India's total wheat and ~11% of rice. The Green Revolution began here. Wheat–rice crop cycle dominates.",
+    landTypes: "Flat alluvial plains of the Indus-Gangetic basin. Well-irrigated via canal networks (Bhakra, UBDC). Highly mechanised farming.",
+    waterSources: "Beas, Sutlej, Ravi rivers + extensive canal irrigation",
+    challenges: "Over-irrigation causing waterlogging; soil salinity; stubble burning",
+    funFact: "Punjab literally means 'Land of Five Rivers' — Jhelum, Chenab, Ravi, Beas, Sutlej"
+  },
+  {
+    id: "haryana",
+    name: "Haryana",
+    region: "north",
+    emoji: "🌿",
+    bg: "https://images.unsplash.com/photo-1560493676-04071c5f467b?w=800&q=70",
+    color: "#558b2f",
+    music: "Ragini — folk song of Haryana fields",
+    musicNote: "Traditional Ragini tune welcomes you to Haryana",
+    rainfall: "450–750 mm",
+    area: "44,212 km²",
+    climate: "Semi-arid; extreme summer heat, cold winters",
+    soils: [
+      { name: "Alluvial", color: "#c8a97e", desc: "Deep, fertile alluvial deposits from Yamuna and Ghaggar rivers." },
+      { name: "Sandy", color: "#e0c090", desc: "In western parts (Hisar, Sirsa); low moisture retention." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Bajra", "Cotton", "Jowar"],
+      rabi: ["Wheat", "Mustard", "Barley", "Gram"],
+      other: ["Sugarcane", "Sunflower", "Vegetables"]
+    },
+    highlights: "Haryana is India's largest producer of milk per capita and a key wheat-rice belt state. Known for its progressive agricultural mechanisation.",
+    landTypes: "Flat alluvial plain; parts of the Aravalli in south; semi-desert in west. Well-irrigated via Western Yamuna Canal.",
+    waterSources: "Yamuna river, Western & Eastern Yamuna Canals, Bhakra Canal",
+    challenges: "Declining water table, soil salinity, crop residue burning",
+    funFact: "Haryana has the highest tractor density per hectare in India"
+  },
+  {
+    id: "up",
+    name: "Uttar Pradesh",
+    region: "north",
+    emoji: "🌼",
+    bg: "https://images.unsplash.com/photo-1591177691494-d2e73b743b97?w=800&q=70",
+    color: "#33691e",
+    music: "Birha — soul-stirring folk of Purvanchal",
+    musicNote: "Birha folk song echoes through the mustard fields of UP",
+    rainfall: "600–1000 mm",
+    area: "240,928 km²",
+    climate: "Subtropical; hot summers, cold winters, moderate monsoon",
+    soils: [
+      { name: "Alluvial (Bhangar)", color: "#b5936b", desc: "Older alluvial, slightly calcareous, found in Doab regions." },
+      { name: "Alluvial (Khadar)", color: "#d4b483", desc: "Newer alluvial near river banks, highly fertile and sandy." },
+      { name: "Red-Yellow", color: "#c0622d", desc: "Bundelkhand region; low fertility, needs fertiliser." }
+    ],
+    crops: {
+      kharif: ["Rice", "Sugarcane", "Jowar", "Bajra", "Maize"],
+      rabi: ["Wheat", "Mustard", "Barley", "Pea", "Lentil"],
+      other: ["Potato", "Onion", "Mango", "Tomato"]
+    },
+    highlights: "UP is India's largest producer of wheat, sugarcane, potato, and several vegetables. It has the largest agricultural area of any state.",
+    landTypes: "Vast Gangetic plain (north and centre); Vindhya plateau (south); Tarai belt (far north). Highly irrigated via tube-wells and canals.",
+    waterSources: "Ganga, Yamuna, Ghaghra, Saryu + tube wells and Sarda Canal",
+    challenges: "Fragmented landholdings, waterlogging in eastern UP, salinity",
+    funFact: "UP alone produces over 18% of India's total food grain production"
+  },
+  {
+    id: "rajasthan",
+    name: "Rajasthan",
+    region: "west",
+    emoji: "🏜️",
+    bg: "https://images.unsplash.com/photo-1600091166971-7f9faad6c498?w=800&q=70",
+    color: "#e65100",
+    music: "Maand — haunting desert folk melodies",
+    musicNote: "Maand folk music drifts across the Thar Desert sands",
+    rainfall: "100–600 mm",
+    area: "342,239 km²",
+    climate: "Arid to semi-arid; extreme heat, cold nights, sparse rainfall",
+    soils: [
+      { name: "Arid Sandy", color: "#e0c080", desc: "Covers most of Thar Desert; very low organic matter, needs intensive irrigation." },
+      { name: "Alluvial", color: "#c4a56e", desc: "Found in Chambal & Luni basins; more fertile, supports crops." },
+      { name: "Red-Yellow", color: "#b54a20", desc: "Eastern Rajasthan hills; moderate fertility." },
+      { name: "Black (Regur)", color: "#5a4a42", desc: "Kota district; cotton-growing belt." }
+    ],
+    crops: {
+      kharif: ["Bajra", "Jowar", "Maize", "Groundnut", "Sesame"],
+      rabi: ["Wheat", "Mustard", "Barley", "Gram", "Coriander"],
+      other: ["Cumin", "Fenugreek", "Guar", "Fennel"]
+    },
+    highlights: "Rajasthan is the largest producer of mustard, bajra, and spices like cumin, coriander, and fenugreek in India. Drip irrigation and IGNP have transformed farming.",
+    landTypes: "Thar Desert (west), Aravalli hills (east-centre), Chambal valley (south-east). Indira Gandhi Nahar Project (IGNP) brings water to desert.",
+    waterSources: "Chambal, Banas rivers; IGNP (world's longest canal); tube wells",
+    challenges: "Severe water scarcity, desertification, low rainfall variability",
+    funFact: "Rajasthan produces 30% of India's wool, with sheep a key dual-purpose livestock"
+  },
+  {
+    id: "maharashtra",
+    name: "Maharashtra",
+    region: "west",
+    emoji: "🍇",
+    bg: "https://images.unsplash.com/photo-1578466455317-13a66c24571f?w=800&q=70",
+    color: "#6a1b9a",
+    music: "Lavani — vibrant folk of the Deccan plateau",
+    musicNote: "Lavani beats and Dholki welcome you to Maharashtra",
+    rainfall: "400–2500 mm",
+    area: "307,713 km²",
+    climate: "Tropical semi-arid (Vidarbha/Marathwada) to humid coastal (Konkan)",
+    soils: [
+      { name: "Black Cotton (Regur)", color: "#4a3a30", desc: "Dominant soil in Vidarbha and Marathwada; ideal for cotton and sorghum; high water-retention." },
+      { name: "Red-Yellow", color: "#b54a20", desc: "Eastern regions; moderate fertility." },
+      { name: "Laterite", color: "#8b4513", desc: "Konkan coastal strip; suitable for coconut, cashew, rice." },
+      { name: "Alluvial", color: "#c9a87c", desc: "River valleys; fertile, suitable for sugarcane." }
+    ],
+    crops: {
+      kharif: ["Cotton", "Soybean", "Sorghum (Jowar)", "Bajra", "Paddy"],
+      rabi: ["Wheat", "Chickpea (Gram)", "Safflower", "Sunflower"],
+      other: ["Sugarcane", "Grapes", "Oranges", "Onion", "Turmeric", "Cashew"]
+    },
+    highlights: "Maharashtra leads India in onion, grapes, oranges, turmeric, and is the top cotton and soybean producer. The Nashik region is India's wine country.",
+    landTypes: "Konkan coastal plains, Sahyadri (Western Ghats), Deccan plateau, Vidarbha. Highly variable rainfall — Cherrapunji-adjacent Ghats to near-desert Marathwada.",
+    waterSources: "Godavari, Krishna, Bhima, Tapi rivers; Krishna-Bhima lifts; drip irrigation in Nashik",
+    challenges: "Farmer distress (Vidarbha), water scarcity, drought in Marathwada",
+    funFact: "Maharashtra accounts for ~35% of India's total grape production and is the only wine-producing state of scale"
+  },
+  {
+    id: "gujarat",
+    name: "Gujarat",
+    region: "west",
+    emoji: "🥜",
+    bg: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&q=70",
+    color: "#f57f17",
+    music: "Garba — spirited folk dance songs",
+    musicNote: "Garba music fills Gujarat's fields during harvest festivals",
+    rainfall: "400–1000 mm",
+    area: "196,024 km²",
+    climate: "Semi-arid to arid; hot, dry summers; seasonal monsoon",
+    soils: [
+      { name: "Black (Regur)", color: "#4a3a30", desc: "Coastal and central Gujarat; cotton belt, high moisture retention." },
+      { name: "Sandy coastal", color: "#e2c87a", desc: "Saurashtra & Kutch; suitable for groundnut, castor." },
+      { name: "Medium black", color: "#6b5040", desc: "North Gujarat plains; suited for wheat and tobacco." }
+    ],
+    crops: {
+      kharif: ["Groundnut", "Cotton", "Bajra", "Maize", "Sesame"],
+      rabi: ["Wheat", "Mustard", "Chickpea", "Cumin"],
+      other: ["Castor", "Tobacco", "Mango", "Banana", "Dates"]
+    },
+    highlights: "Gujarat is the largest producer of groundnut, cotton, and castor in India. Sabarmati basin and Narmada project transformed irrigation. White Revolution (dairy) is equally prominent.",
+    landTypes: "Coastal plains, Saurashtra peninsula, Kutch salt desert, Chhota Udaipur hilly east. Narmada canal irrigation is transformative.",
+    waterSources: "Narmada, Sabarmati, Mahi, Tapi + Sardar Sarovar Dam canal network",
+    challenges: "Soil salinity in coastal zones, groundwater depletion, dry spells",
+    funFact: "Gujarat produces ~80% of India's castor oil, which is used in over 700 industrial products"
+  },
+  {
+    id: "mp",
+    name: "Madhya Pradesh",
+    region: "central",
+    emoji: "🌻",
+    bg: "https://images.unsplash.com/photo-1625304498786-c34f78cbfb77?w=800&q=70",
+    color: "#e65100",
+    music: "Fag — folk song of Bundeli farmers",
+    musicNote: "Bundeli Fag echoes across Madhya Pradesh's heartland",
+    rainfall: "800–1500 mm",
+    area: "308,252 km²",
+    climate: "Subtropical semi-arid to sub-humid; extreme summer heat",
+    soils: [
+      { name: "Black (Regur)", color: "#4a3a30", desc: "Malwa plateau and Narmada valley; ideal for cotton, soybean, wheat." },
+      { name: "Red-Yellow", color: "#b54a20", desc: "Eastern MP (Rewa, Satna); moderate fertility." },
+      { name: "Alluvial", color: "#c9a87c", desc: "Along Chambal; fertile, suited to intensive crops." }
+    ],
+    crops: {
+      kharif: ["Soybean", "Paddy", "Maize", "Jowar", "Cotton"],
+      rabi: ["Wheat", "Chickpea", "Lentil", "Mustard", "Garlic"],
+      other: ["Garlic", "Onion", "Coriander", "Opium (licensed)"]
+    },
+    highlights: "MP is India's top soybean producer (~50% national output), top wheat producer after Punjab/UP, and largest producer of garlic and opium (for pharma, licensed).",
+    landTypes: "Malwa plateau (west), Vindhya/Satpura ranges (centre-south), Narmada-Son valley, Chhattisgarh plain (east). Chambal ravines in north.",
+    waterSources: "Narmada, Chambal, Betwa, Tapti, Ken, Sone",
+    challenges: "Ravine erosion in Chambal, low irrigation coverage in east",
+    funFact: "MP's Malwa plateau produces some of the finest wheat in the world due to its distinctive black soil and dry-cool rabi season"
+  },
+  {
+    id: "chhattisgarh",
+    name: "Chhattisgarh",
+    region: "central",
+    emoji: "🍚",
+    bg: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=70",
+    color: "#1b5e20",
+    music: "Panthi — tribal devotional folk music",
+    musicNote: "Panthi folk music plays as you enter the 'Rice Bowl of India'",
+    rainfall: "1000–1500 mm",
+    area: "135,192 km²",
+    climate: "Sub-humid to humid tropical; heavy monsoon in north",
+    soils: [
+      { name: "Red-Yellow", color: "#b54a20", desc: "Most common; covers plains and highlands; good for rice, coarse grains." },
+      { name: "Laterite", color: "#9b4a10", desc: "High plateaus; low fertility, used for minor millets." },
+      { name: "Black", color: "#4a3a30", desc: "Mahanadi valley; fertile, suitable for wheat and vegetables." }
+    ],
+    crops: {
+      kharif: ["Paddy (Rice)", "Maize", "Arhar (Pigeon pea)", "Soybean"],
+      rabi: ["Wheat", "Gram", "Linseed", "Mustard"],
+      other: ["Vegetables", "Minor millets", "Tendu leaves (non-food)"]
+    },
+    highlights: "Called the 'Rice Bowl of Central India' — Chhattisgarh has over 20,000 native rice varieties. Tribal farming practices preserve unique biodiversity.",
+    landTypes: "Chhattisgarh basin (central plain), Maikal hills, Bastar plateau with dense forests. High forest cover limits farming but preserves biodiversity.",
+    waterSources: "Mahanadi, Sheonath, Hasdeo, Indravati rivers",
+    challenges: "Low mechanisation, Naxal-affected areas limiting agri investment",
+    funFact: "The Bastar region of Chhattisgarh preserves over 2,000 tribal varieties of rice seeds maintained by Gond and Halba tribes"
+  },
+  {
+    id: "westbengal",
+    name: "West Bengal",
+    region: "east",
+    emoji: "🐟",
+    bg: "https://images.unsplash.com/photo-1615552932490-4c25d19a7b0b?w=800&q=70",
+    color: "#1565c0",
+    music: "Baul — mystical folk songs of Bengal",
+    musicNote: "Baul singer's ektara plays across Bengal's delta fields",
+    rainfall: "1500–2500 mm",
+    area: "88,752 km²",
+    climate: "Humid tropical; heavy monsoon, mild winter",
+    soils: [
+      { name: "Alluvial (Delta)", color: "#9b8e72", desc: "Ganges-Brahmaputra delta; highly fertile, deep silt — ideal for rice, jute." },
+      { name: "Red Laterite", color: "#b04a20", desc: "Western plateaus (Purulia, Bankura); acidic, suitable for millets." },
+      { name: "Coastal saline", color: "#8a9e9e", desc: "Sundarban mangrove delta; rice cultivation with salt-tolerant varieties." }
+    ],
+    crops: {
+      kharif: ["Aman Rice", "Jute", "Maize", "Aus Rice"],
+      rabi: ["Boro Rice", "Wheat", "Mustard", "Potato"],
+      other: ["Tea (Darjeeling/Dooars)", "Potato", "Vegetables", "Paan (Betel leaf)"]
+    },
+    highlights: "WB is India's top rice, jute, and potato producer. Darjeeling produces the world's finest tea. Pisciculture (fish farming) is equally important as crop farming.",
+    landTypes: "Terai (north), Bengal Delta (south), Rarh Plateau (west), Gangetic alluvial plain (central), Sundarban mangroves (coast).",
+    waterSources: "Ganga, Brahmaputra, Damodar, Teesta, Mahananda",
+    challenges: "Flash flooding, cyclone damage in delta, arsenic in groundwater",
+    funFact: "Darjeeling tea is a GI-tagged product — only tea grown at 600–2000m elevation in Darjeeling hills earns the authentic label"
+  },
+  {
+    id: "odisha",
+    name: "Odisha",
+    region: "east",
+    emoji: "🌊",
+    bg: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800&q=70",
+    color: "#0277bd",
+    music: "Sambalpuri — rich tribal folk song",
+    musicNote: "Sambalpuri dhol and tasa greet you in Odisha",
+    rainfall: "1200–1800 mm",
+    area: "155,707 km²",
+    climate: "Tropical hot & humid; heavy SW monsoon",
+    soils: [
+      { name: "Red-Yellow", color: "#b54a20", desc: "Most of Odisha's uplands; moderately fertile, porous." },
+      { name: "Alluvial", color: "#c0a87a", desc: "Mahanadi & Brahmani deltas; highly fertile, rice cultivation." },
+      { name: "Laterite", color: "#9b4a10", desc: "Northern Odisha (Koraput/Kalahandi); low fertility, suited to minor millets." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Maize", "Arhar", "Groundnut", "Sesame"],
+      rabi: ["Rice (Boro)", "Wheat", "Mustard", "Gram", "Lentil"],
+      other: ["Jute", "Turmeric", "Ginger", "Cashew", "Coconut"]
+    },
+    highlights: "Odisha is a major rice producer and home to unique 'black rice' (Kalajeera) and scented rice varieties. Coastal aquaculture is rapidly expanding.",
+    landTypes: "Eastern Ghats (west), fertile coastal plains (east), Mahanadi delta. Prone to cyclones and floods.",
+    waterSources: "Mahanadi, Brahmani, Baitarani, Rushikulya",
+    challenges: "Cyclone vulnerability, flood-prone delta, tribal farmer isolation",
+    funFact: "Odisha's Kalahandi region has over 2,000 traditional rice varieties — a genetic treasure chest of rice biodiversity"
+  },
+  {
+    id: "bihar",
+    name: "Bihar",
+    region: "east",
+    emoji: "🥭",
+    bg: "https://images.unsplash.com/photo-1591177691494-d2e73b743b97?w=800&q=70",
+    color: "#e65100",
+    music: "Chaiti — seasonal folk song of spring harvest",
+    musicNote: "Chaiti folk songs fill Bihar's mango orchards",
+    rainfall: "1000–1400 mm",
+    area: "94,163 km²",
+    climate: "Subtropical, hot summers, cold winters, heavy monsoon in north",
+    soils: [
+      { name: "Alluvial (North)", color: "#c4a57a", desc: "Terai alluvial from Himalayas; very fertile, used for rice, wheat, maize." },
+      { name: "Alluvial (South)", color: "#9b8060", desc: "Older alluvial; slightly less fertile, uses more irrigation." },
+      { name: "Vindhyan Red", color: "#b54a20", desc: "Small south-eastern strip; less productive." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Maize", "Arhar", "Jute"],
+      rabi: ["Wheat", "Mustard", "Barley", "Gram", "Lentil"],
+      other: ["Litchi", "Mango", "Banana", "Vegetables"]
+    },
+    highlights: "Bihar is India's largest litchi producer (Muzaffarpur litchi is GI-tagged). Maize production is booming. Bihar's 'Shahi Litchi' is exported worldwide.",
+    landTypes: "North Bihar: Terai and Gangetic plain (flood plains of Kosi, Gandak, Bagmati). South Bihar: older alluvial Ganga plain with rolling terrain.",
+    waterSources: "Ganga, Kosi, Gandak, Sone, Mahananda",
+    challenges: "Repeated flooding (Kosi belt), small fragmented land holdings, low irrigation in south",
+    funFact: "Muzaffarpur's Shahi Litchi has GI tag; Bihar produces 40% of India's litchi crop"
+  },
+  {
+    id: "andhra",
+    name: "Andhra Pradesh",
+    region: "south",
+    emoji: "🌶️",
+    bg: "https://images.unsplash.com/photo-1582271874919-f1edba64c6a0?w=800&q=70",
+    color: "#b71c1c",
+    music: "Harikatha — devotional folk narrative",
+    musicNote: "Harikatha performance rings across Andhra's chilli fields",
+    rainfall: "600–1200 mm",
+    area: "162,975 km²",
+    climate: "Tropical semi-arid to sub-humid; hot summers, moderate monsoon",
+    soils: [
+      { name: "Red Sandy", color: "#c0521e", desc: "Most of Andhra; well-drained, needs fertiliser, good for groundnut." },
+      { name: "Black (Regur)", color: "#4a3a30", desc: "Krishna-Guntur delta area; ideal for cotton and chillies." },
+      { name: "Alluvial (Delta)", color: "#c9a87c", desc: "Krishna-Godavari delta; highly fertile, intense rice cultivation." },
+      { name: "Laterite", color: "#8b4513", desc: "Coastal belt; coconut and cashew." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Cotton", "Groundnut", "Maize", "Bajra"],
+      rabi: ["Paddy (Rabi)", "Jowar", "Chickpea", "Sunflower"],
+      other: ["Chilli", "Tobacco", "Turmeric", "Mango", "Banana"]
+    },
+    highlights: "AP leads India in chilli production (Guntur chilli is globally famous), tobacco, and aquaculture (shrimp). Krishna-Godavari delta is one of India's most intensive farming zones.",
+    landTypes: "Krishna-Godavari delta (east coast), Eastern Ghats (west), Rayalaseema plateau (south-west). Coastal strip is highly fertile.",
+    waterSources: "Krishna, Godavari, Penna, Tungabhadra",
+    challenges: "Cyclone damage on coast, over-exploitation of groundwater in Rayalaseema",
+    funFact: "Guntur district in AP produces 30% of the world's chilli supply — it is the global chilli capital"
+  },
+  {
+    id: "telangana",
+    name: "Telangana",
+    region: "south",
+    emoji: "💧",
+    bg: "https://images.unsplash.com/photo-1587560699334-cc4ff634909a?w=800&q=70",
+    color: "#c62828",
+    music: "Perini — ancient warrior folk dance music",
+    musicNote: "Perini drums herald the cotton harvest in Telangana",
+    rainfall: "700–1150 mm",
+    area: "112,077 km²",
+    climate: "Tropical semi-arid; very hot summers, moderate monsoon",
+    soils: [
+      { name: "Red Sandy", color: "#c0521e", desc: "Dominant; covers uplands; suitable for cotton, groundnut, jowar." },
+      { name: "Black (Medium)", color: "#5a4540", desc: "Telangana plateau; good moisture retention, cotton belt." },
+      { name: "Alluvial", color: "#c4a57a", desc: "Godavari & Krishna valleys; paddy and sugarcane." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Cotton", "Maize", "Soybean", "Groundnut"],
+      rabi: ["Paddy (Rabi)", "Wheat", "Chickpea", "Sunflower"],
+      other: ["Chilli", "Turmeric", "Mango", "Cashew", "Sugarcane"]
+    },
+    highlights: "Telangana transformed after Kaleshwaram Lift Irrigation — Paddy area tripled in 5 years. It is also the top cotton producer of southern India.",
+    landTypes: "Deccan plateau, Godavari-Krishna river basins. Kaleshwaram project (world's largest multi-stage lift irrigation) is reshaping agriculture.",
+    waterSources: "Godavari, Krishna, Musi + Kaleshwaram Lift Irrigation Project",
+    challenges: "Farmer suicides in cotton belt, groundwater depletion in uplands",
+    funFact: "Telangana's Kaleshwaram Lift Irrigation Project is the world's largest and most complex such project — pumping water from Godavari to drought-prone areas"
+  },
+  {
+    id: "karnataka",
+    name: "Karnataka",
+    region: "south",
+    emoji: "☕",
+    bg: "https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=800&q=70",
+    color: "#4e342e",
+    music: "Dollu Kunitha — powerful drum folk dance",
+    musicNote: "Dollu Kunitha drums echo through Karnataka's coffee estates",
+    rainfall: "500–3500 mm",
+    area: "191,791 km²",
+    climate: "Varied: arid north-east, semi-arid interior, humid coastal Malnad",
+    soils: [
+      { name: "Red Sandy", color: "#c0521e", desc: "Interior Deccan plateau; groundnut, ragi, cotton." },
+      { name: "Black (Medium)", color: "#5a4540", desc: "Northern districts (Bidar, Gulbarga); cotton, jowar." },
+      { name: "Laterite", color: "#9b4a10", desc: "Coastal Karnataka (Malnad, Coast); coffee, tea, areca nut." },
+      { name: "Red Loam", color: "#a04a20", desc: "South Karnataka; ragi, sugarcane, vegetables." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Ragi", "Maize", "Cotton", "Groundnut", "Jowar"],
+      rabi: ["Wheat", "Chickpea", "Safflower", "Sunflower"],
+      other: ["Coffee", "Tea", "Cardamom", "Coconut", "Areca nut", "Sugarcane", "Silk (sericulture)"]
+    },
+    highlights: "Karnataka is India's top coffee producer (70% of India's coffee), largest silk producer, and major ragi producer. The Western Ghats zone has incredible agri-biodiversity.",
+    landTypes: "Coastal strip (Karavali), Western Ghats (Malnad), Deccan plateau (Maidan), Northern plateau (Bidar). Most diverse agri-climate zones in India.",
+    waterSources: "Krishna, Cauvery, Tungabhadra, Sharavathi, Netravathi",
+    challenges: "North-south water inequality, drought in northern districts, Cauvery water dispute",
+    funFact: "Coorg (Kodagu) in Karnataka is called the 'Coffee Cup of India' — it alone produces 30% of India's total coffee"
+  },
+  {
+    id: "kerala",
+    name: "Kerala",
+    region: "south",
+    emoji: "🥥",
+    bg: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&q=70",
+    color: "#2e7d32",
+    music: "Thiruvathira Kali — graceful women's folk song",
+    musicNote: "Thiruvathira Kali melody flows through Kerala's backwaters and paddy fields",
+    rainfall: "2000–5000 mm",
+    area: "38,852 km²",
+    climate: "Humid tropical; two monsoons (SW + NE), very high rainfall",
+    soils: [
+      { name: "Laterite", color: "#9b4a10", desc: "Dominant across midland; acidic, porous, suits rubber, coconut, pepper." },
+      { name: "Alluvial", color: "#c0a87a", desc: "River valleys & coastal (Kuttanad); intensive paddy farming." },
+      { name: "Coastal Sandy", color: "#e0c880", desc: "Littoral strip; coconut, cashew." },
+      { name: "Forest Soil", color: "#5a7a50", desc: "High-altitude Ghats; cardamom, tea, coffee." }
+    ],
+    crops: {
+      kharif: ["Paddy (Kharif)", "Ginger", "Tapioca"],
+      rabi: ["Paddy (Rabi)", "Vegetables"],
+      other: ["Coconut", "Rubber", "Black Pepper", "Cardamom", "Coffee", "Cashew", "Banana", "Jackfruit"]
+    },
+    highlights: "Kerala is India's top producer of rubber, coconut, black pepper, cardamom, and ginger. Kuttanad is the lowest-altitude farming zone in Asia ('Rice Bowl below sea level').",
+    landTypes: "Western Ghats (east), rolling midland, coastal lowland. Backwater lagoons. Kuttanad is farmed below sea level.",
+    waterSources: "41 westward rivers (Periyar, Bharathapuzha, Pamba), very high rainfall",
+    challenges: "Fragmented small holdings, rubber price volatility, declining paddy area",
+    funFact: "Kuttanad in Kerala is one of only two places in the world where farming happens below sea level — up to 2.2m below the Arabian Sea"
+  },
+  {
+    id: "tamilnadu",
+    name: "Tamil Nadu",
+    region: "south",
+    emoji: "🌹",
+    bg: "https://images.unsplash.com/photo-1621351183012-e2f9972dd9bf?w=800&q=70",
+    color: "#880e4f",
+    music: "Kummi — ancient women's circle folk song",
+    musicNote: "Kummi songs ring through Tamil Nadu's jasmine and paddy fields",
+    rainfall: "600–2500 mm",
+    area: "130,058 km²",
+    climate: "Tropical; SW monsoon (June–Sep) + NE monsoon (Oct–Dec)",
+    soils: [
+      { name: "Red Loam", color: "#b04a20", desc: "Most common; moderately fertile, wide crop suitability." },
+      { name: "Black Cotton", color: "#4a3a30", desc: "Coimbatore plateau and Cauvery delta areas; cotton, sugarcane." },
+      { name: "Alluvial (Cauvery)", color: "#c9a87c", desc: "Cauvery delta (Thanjavur, Trichy); most fertile, intensive double-crop paddy." },
+      { name: "Laterite", color: "#9b4a10", desc: "Nilgiris and Western Ghats; tea, coffee, vegetables." }
+    ],
+    crops: {
+      kharif: ["Paddy (Kuruvai)", "Maize", "Groundnut", "Cotton"],
+      rabi: ["Paddy (Samba)", "Wheat", "Pulses"],
+      other: ["Sugarcane", "Banana", "Jasmine", "Turmeric", "Coconut", "Mango", "Tea (Nilgiris)"]
+    },
+    highlights: "Tamil Nadu leads India in jasmine, banana, and flowers; the Cauvery delta is called the 'Granary of South India'. Nilgiris tea is world-famous.",
+    landTypes: "Nilgiri hills (NW), Eastern Ghats, Cauvery delta plains, Coromandel coast. Receives both monsoons, giving unique farming calendar.",
+    waterSources: "Cauvery, Palar, Vaigai, Tamiraparani + tank irrigation (ancient)",
+    challenges: "Cauvery water dispute, groundwater depletion, erratic NE monsoon",
+    funFact: "Tamil Nadu has 40,000 irrigation tanks — ancient water management structures built 2,000 years ago, many still in use"
+  },
+  {
+    id: "assam",
+    name: "Assam",
+    region: "northeast",
+    emoji: "🍵",
+    bg: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=70",
+    color: "#004d40",
+    music: "Bihu — celebratory harvest folk song",
+    musicNote: "Bihu dhol and toka play joyfully — Assam's most beloved festival",
+    rainfall: "1600–3300 mm",
+    area: "78,438 km²",
+    climate: "Humid subtropical; very heavy monsoon, mild winter",
+    soils: [
+      { name: "Alluvial (Brahmaputra)", color: "#c4a57a", desc: "Brahmaputra valley; very fertile, high silt from Himalayas; ideal for tea and paddy." },
+      { name: "Red Sandy", color: "#b04a20", desc: "Southern hills; suited for pineapple and citrus." },
+      { name: "Peat/Bog", color: "#4a5a40", desc: "Low-lying beel areas; unique wetland paddy cultivation." }
+    ],
+    crops: {
+      kharif: ["Paddy (Sali rice)", "Jute", "Sesame", "Maize"],
+      rabi: ["Paddy (Boro)", "Wheat", "Mustard"],
+      other: ["Tea", "Pineapple", "Banana", "Bamboo", "Silk (Muga, Eri)"]
+    },
+    highlights: "Assam produces 55% of India's tea and is home to Muga silk (spun by golden silkworms, unique to Assam). Bihu festivals celebrate the rice harvest.",
+    landTypes: "Brahmaputra valley (north), Barak valley (south), Mikir hills, Karbi Anglong. Flood plains renewed by annual Brahmaputra floods.",
+    waterSources: "Brahmaputra, Barak, Subansiri, Dhansiri",
+    challenges: "Annual Brahmaputra floods, soil erosion, shifting cultivation in hills",
+    funFact: "Assam's Muga silk is the world's only naturally golden-yellow silk and is GI-protected — produced exclusively in Assam's Brahmaputra valley"
+  },
+  {
+    id: "himachal",
+    name: "Himachal Pradesh",
+    region: "north",
+    emoji: "🍎",
+    bg: "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=800&q=70",
+    color: "#880e4f",
+    music: "Nati — festive hill folk dance music",
+    musicNote: "Nati folk music echoes through Himachal's apple orchards",
+    rainfall: "300–3200 mm",
+    area: "55,673 km²",
+    climate: "Alpine to subtropical; cold winters, snow at altitude; variable monsoon",
+    soils: [
+      { name: "Mountain Meadow", color: "#6a8e6a", desc: "High-altitude (above 2500m); used for grazing, potato, peas." },
+      { name: "Brown Forest", color: "#7a6050", desc: "Mid-hills (1000–2500m); apple orchards, stone fruits." },
+      { name: "Alluvial (Valleys)", color: "#c4a57a", desc: "Valley floors (Kullu, Mandi); wheat, vegetables, rice." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Maize", "Ginger"],
+      rabi: ["Wheat", "Barley", "Pea"],
+      other: ["Apple", "Plum", "Pear", "Cherry", "Apricot", "Potato", "Mushroom", "Hops", "Saffron (Kinnaur)"]
+    },
+    highlights: "HP is India's top apple-producing state (80% of Indian apples). Kullu Valley and Shimla hills are the apple belt. High-altitude horticulture is the backbone of the economy.",
+    landTypes: "Great Himalayan range (north), Lesser Himalayas (Dhauladhar, Pir Panjal), Outer Himalayas (Shivalik). Kullu, Kangra, Spiti, Lahaul valleys.",
+    waterSources: "Beas, Ravi, Chenab, Sutlej + glacial melt",
+    challenges: "Climate change threatening apple zones (moving higher), soil erosion, hailstorms",
+    funFact: "Himachal Pradesh produces nearly 9 crore boxes of apples annually — each box travels across India and is the economic lifeline of thousands of hill families"
+  },
+  {
+    id: "uttarakhand",
+    name: "Uttarakhand",
+    region: "north",
+    emoji: "🏔️",
+    bg: "https://images.unsplash.com/photo-1606840830348-fed2bc31e5c5?w=800&q=70",
+    color: "#1a237e",
+    music: "Jagar — mystical divine invocation folk music",
+    musicNote: "Jagar folk invocation music plays through Uttarakhand's terraced fields",
+    rainfall: "500–2000 mm",
+    area: "53,483 km²",
+    climate: "Alpine in Garhwal/Kumaon mountains; subtropical in Terai",
+    soils: [
+      { name: "Mountain Soils", color: "#6a7060", desc: "Thin, acidic; terrace cultivation of millets, wheat, potato." },
+      { name: "Alluvial (Terai)", color: "#c9a87c", desc: "Doon valley and Terai; highly fertile, rice, sugarcane, wheat." },
+      { name: "Bhabar Sandy", color: "#d0b87c", desc: "At Himalayan foothills junction; porous, used for grass and orchards." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Maize", "Finger Millet (Mandwa)", "Arhar"],
+      rabi: ["Wheat", "Barley", "Mustard", "Pea"],
+      other: ["Apple", "Walnut", "Stone Fruits", "Potato", "Ginger", "Turmeric", "Hemp", "Medicinal herbs"]
+    },
+    highlights: "Famous for Basmati rice from Doon valley (GI-tagged), finger millet ('Mandwa'), and medicinal herbs. Organic farming movement is strong in hill regions.",
+    landTypes: "High Himalayas (Badrinath, Kedarnath areas), Lesser Himalayas, Shivalik hills, Doon valley, Terai. Terrace cultivation on steep slopes.",
+    waterSources: "Ganga (Bhagirathi/Alaknanda), Yamuna, Ramganga, Kosi + glaciers",
+    challenges: "Hill agriculture abandonment (youth migration), landslides, glacial retreat",
+    funFact: "Uttarakhand's Doon Valley Basmati rice holds a GI tag — its unique aroma comes from the specific combination of Himalayan water and Doon Valley microclimate"
+  },
+  {
+    id: "jharkhand",
+    name: "Jharkhand",
+    region: "east",
+    emoji: "🌲",
+    bg: "https://images.unsplash.com/photo-1560493676-04071c5f467b?w=800&q=70",
+    color: "#33691e",
+    music: "Sohrai — tribal harvest celebration folk music",
+    musicNote: "Sohrai folk music marks the harvest in Jharkhand's tribal heartland",
+    rainfall: "1200–1500 mm",
+    area: "79,716 km²",
+    climate: "Tropical semi-arid; hot summers, moderate monsoon",
+    soils: [
+      { name: "Red Laterite", color: "#b04a20", desc: "Most of plateau; acidic, porous, low fertility — rice and millets." },
+      { name: "Alluvial", color: "#c4a57a", desc: "River valleys (Damodar, Subarnarekha); fertile, paddy." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Maize", "Arhar", "Groundnut", "Sesame"],
+      rabi: ["Wheat", "Mustard", "Gram", "Lentil"],
+      other: ["Lac (resin)", "Mahua (tree crop)", "Minor forest produce", "Vegetables"]
+    },
+    highlights: "Jharkhand has strong tribal farming traditions. Lac cultivation (for shellac) is unique here — India's 55% of lac comes from Jharkhand. Mahua is a culturally vital tree crop.",
+    landTypes: "Chota Nagpur plateau; undulating, forested terrain. Valley agriculture along Damodar, Subarnarekha. Limited flat arable land.",
+    waterSources: "Damodar, Subarnarekha, Koel, North Koel, Brahmani",
+    challenges: "Poor irrigation coverage, soil erosion, mining area land degradation",
+    funFact: "India produces 65% of the world's lac (used in shellac, jewellery, furniture polish) — Jharkhand is the heart of India's lac production"
+  },
+  {
+    id: "sikkim",
+    name: "Sikkim",
+    region: "northeast",
+    emoji: "🌿",
+    bg: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=800&q=70",
+    color: "#1b5e20",
+    music: "Chu Faat — cheerful Lepcha folk song",
+    musicNote: "Lepcha folk music plays amid Sikkim's organic cardamom gardens",
+    rainfall: "2000–4000 mm",
+    area: "7,096 km²",
+    climate: "Humid subtropical to alpine; heavy monsoon, cold winters at altitude",
+    soils: [
+      { name: "Mountain Forest", color: "#5a6a50", desc: "Steep hill soils; acidic, thin — suited for cardamom, ginger, tea." },
+      { name: "Alluvial (Valley)", color: "#c4a57a", desc: "Teesta valley; paddy and vegetable cultivation." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Maize", "Ginger", "Cardamom"],
+      rabi: ["Wheat", "Buckwheat", "Barley", "Vegetables"],
+      other: ["Large Cardamom", "Tea (Organic)", "Mandarin Orange", "Apple", "Flower farming"]
+    },
+    highlights: "Sikkim became India's first fully Organic State in 2016 — all farming is chemical-free. It is the world's largest producer of large cardamom.",
+    landTypes: "Tiny Himalayan state with dramatic altitude variation from 300m to 8,586m (Kangchenjunga). Teesta valley for paddy; high slopes for cardamom.",
+    waterSources: "Teesta river and its tributaries; glacier melt",
+    challenges: "Landslides, GLOF risk (glacial lake outburst), very small farm holdings",
+    funFact: "Sikkim is India's ONLY 100% Organic state — chemical pesticides and fertilisers are completely banned. It received the UN Future Policy Gold Award for this achievement"
+  },
+  {
+    id: "manipur",
+    name: "Manipur",
+    region: "northeast",
+    emoji: "🌺",
+    bg: "https://images.unsplash.com/photo-1615761138780-70a6eba08e54?w=800&q=70",
+    color: "#ad1457",
+    music: "Pena — traditional Meitei string folk music",
+    musicNote: "Pena string music echoes across Manipur's floating gardens",
+    rainfall: "1500–2500 mm",
+    area: "22,327 km²",
+    climate: "Sub-tropical; heavy monsoon in valley, cooler in hills",
+    soils: [
+      { name: "Alluvial (Valley)", color: "#c4a57a", desc: "Imphal valley; fertile, paddy belt." },
+      { name: "Red Hill", color: "#b04a20", desc: "Surrounding hill districts; moderate fertility, slash-and-burn (jhum) shifting cultivation." }
+    ],
+    crops: {
+      kharif: ["Paddy", "Maize"],
+      rabi: ["Wheat", "Vegetables", "Mustard"],
+      other: ["Black Rice (Chakhao)", "Pineapple", "Orange", "Ginger", "Lemon", "Lotus stem (from Loktak Lake)"]
+    },
+    highlights: "Manipur's 'Chakhao' (black sticky rice) is GI-tagged and globally sought-after. Loktak Lake's floating islands (Phumdis) support unique subsistence farming.",
+    landTypes: "Central valley (Imphal plain), surrounding forested hills on all sides. Loktak — India's largest freshwater lake with floating farming islands.",
+    waterSources: "Barak, Imphal, Iril rivers; Loktak Lake",
+    challenges: "Jhum (shifting) cultivation causing deforestation, limited plain land",
+    funFact: "Manipur's Loktak Lake has floating biomass islands (Phumdis) where tribal communities practice a unique form of floating subsistence farming — found nowhere else in the world"
+  },
+  {
+    id: "goa",
+    name: "Goa",
+    region: "west",
+    emoji: "🌴",
+    bg: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800&q=70",
+    color: "#00695c",
+    music: "Fugdi — energetic women's folk circle dance",
+    musicNote: "Fugdi folk music plays in Goa's coastal spice plantations",
+    rainfall: "2500–4000 mm",
+    area: "3,702 km²",
+    climate: "Tropical humid; very heavy SW monsoon, warm all year",
+    soils: [
+      { name: "Laterite", color: "#9b4a10", desc: "Most of Goa; well-drained, acidic; coconut, cashew, spices." },
+      { name: "Alluvial (Coastal)", color: "#c4a57a", desc: "River estuaries; khazan paddy fields below sea level." }
+    ],
+    crops: {
+      kharif: ["Paddy (Khazan fields)", "Nachni"],
+      rabi: ["Vegetables"],
+      other: ["Coconut", "Cashew", "Areca nut", "Pepper", "Pineapple", "Mango (Alphonso)"]
+    },
+    highlights: "Goa's 'Khazan' fields are ancient tidal wetland paddy systems — one of the oldest engineered farming systems in Asia. Alphonso mango and Goa cashew are prized worldwide.",
+    landTypes: "Narrow coastal strip, Western Ghats to the east. Khazan (tidal flat) farming along estuaries. Mining-affected laterite hills.",
+    waterSources: "Mandovi, Zuari, Sal, Terekhol rivers + coastal estuaries",
+    challenges: "Urbanisation eating into farmland, mining pollution, saline water intrusion",
+    funFact: "Goa's Khazan paddy fields — built with ancient sea-sluice technology — have been cultivating rice below sea level for over 1,500 years"
+  }
+];
+
+// ========== RENDER STATE CARDS ==========
+function renderCards(states) {
+  const grid = document.getElementById('statesGrid');
+  const noRes = document.getElementById('noResults');
+  grid.innerHTML = '';
+  if (states.length === 0) { noRes.classList.add('show'); return; }
+  noRes.classList.remove('show');
+  states.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'state-card';
+    card.style.backgroundImage = `url('${s.bg}')`;
+    card.style.animationDelay = `${i * 0.04}s`;
+    card.innerHTML = `
+      <div class="state-card-overlay"></div>
+      <div class="state-card-body">
+        <span class="state-emoji">${s.emoji}</span>
+        <h5>${s.name}</h5>
+        <div class="crop-pills">
+          ${[...s.crops.kharif.slice(0,2), ...s.crops.other.slice(0,1)].map(c=>`<span class="crop-pill">${c}</span>`).join('')}
+        </div>
+      </div>`;
+    card.onclick = () => openModal(s);
+    grid.appendChild(card);
+  });
+}
+
+// ========== MODAL ==========
+function openModal(state) {
+  document.getElementById('modalTitle').textContent = state.emoji + ' ' + state.name;
+  document.getElementById('modalRegion').textContent = regionLabel(state.region) + ' • India';
+  document.getElementById('modalHero').style.backgroundImage = `url('${state.bg}')`;
+  document.getElementById('modalHero').style.backgroundSize = 'cover';
+
+  const body = document.getElementById('modalBody');
+  body.innerHTML = `
+    <div class="music-bar">
+      <span class="music-icon">🎵</span>
+      <div class="music-info">
+        <h6>${state.music}</h6>
+        <p>${state.musicNote}</p>
+      </div>
+      <div class="music-wave">
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-chip"><div class="stat-val">${state.rainfall}</div><div class="stat-lbl">Annual Rainfall</div></div>
+      <div class="stat-chip"><div class="stat-val">${state.area}</div><div class="stat-lbl">Total Area</div></div>
+    </div>
+
+    <div class="info-section-title">🌍 Climate & Land</div>
+    <div class="info-card">
+      <h6>Climate</h6><p>${state.climate}</p>
+    </div>
+    <div class="info-card">
+      <h6>Land Types</h6><p>${state.landTypes}</p>
+    </div>
+    <div class="info-card">
+      <h6>Water Sources</h6><p>${state.waterSources}</p>
+    </div>
+
+    <div class="info-section-title">🟫 Soil Types</div>
+    <div class="soil-bar" style="margin-bottom:14px;">
+      ${state.soils.map(s=>`<div class="soil-chip" style="background:${hexToLight(s.color)};color:${s.color}"><div class="soil-dot" style="background:${s.color}"></div>${s.name}</div>`).join('')}
+    </div>
+    ${state.soils.map(s=>`<div class="info-card"><h6 style="color:#5a3a20">${s.name} Soil</h6><p>${s.desc}</p></div>`).join('')}
+
+    <div class="info-section-title">🌾 Crops by Season</div>
+    <div class="info-card">
+      <h6>☔ Kharif (June–October)</h6>
+      <div class="tag-row" style="margin-top:8px">${state.crops.kharif.map(c=>`<span class="tag tag-blue">${c}</span>`).join('')}</div>
+    </div>
+    <div class="info-card">
+      <h6>❄️ Rabi (November–March)</h6>
+      <div class="tag-row" style="margin-top:8px">${state.crops.rabi.map(c=>`<span class="tag tag-amber">${c}</span>`).join('')}</div>
+    </div>
+    <div class="info-card">
+      <h6>🌱 Zaid / Perennial / Cash Crops</h6>
+      <div class="tag-row" style="margin-top:8px">${state.crops.other.map(c=>`<span class="tag tag-green">${c}</span>`).join('')}</div>
+    </div>
+
+    <div class="info-section-title">⭐ Agricultural Highlights</div>
+    <div class="info-card"><p>${state.highlights}</p></div>
+
+    <div class="info-section-title">⚠️ Challenges</div>
+    <div class="info-card" style="background:#fff8e1"><p>${state.challenges}</p></div>
+
+    <div class="info-section-title">💡 Did You Know?</div>
+    <div class="info-card" style="background:#e3f2fd"><p style="font-weight:600;color:#01579b">${state.funFact}</p></div>
+  `;
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  playFolkTone(state.id);
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  stopTone();
+}
+
+function regionLabel(r) {
+  const m = {north:'North India',south:'South India',east:'East India',west:'West India',central:'Central India',northeast:'Northeast India'};
+  return m[r] || r;
+}
+function hexToLight(hex) {
+  return hex + '22';
+}
+
+// ========== FOLK MUSIC (Web Audio) ==========
+let audioCtx = null, gainNode = null, activeNodes = [];
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+const FOLK_PATTERNS = {
+  punjab:    { notes: [293, 329, 392, 440, 493, 392, 329, 293], tempo: 0.18, wave: 'sawtooth' },
+  haryana:   { notes: [261, 294, 330, 349, 392, 330, 294, 261], tempo: 0.22, wave: 'triangle' },
+  up:        { notes: [196, 220, 247, 262, 294, 262, 247, 220], tempo: 0.25, wave: 'sine' },
+  rajasthan: { notes: [220, 246, 261, 293, 329, 293, 261, 246], tempo: 0.3, wave: 'sawtooth' },
+  maharashtra:{ notes: [293, 329, 370, 440, 493, 440, 370, 329], tempo: 0.2, wave: 'triangle' },
+  gujarat:   { notes: [349, 392, 440, 494, 523, 494, 440, 392], tempo: 0.17, wave: 'square' },
+  mp:        { notes: [261, 293, 329, 349, 392, 349, 329, 293], tempo: 0.28, wave: 'sine' },
+  chhattisgarh: { notes: [220, 247, 277, 330, 370, 330, 277, 247], tempo: 0.26, wave: 'triangle' },
+  westbengal:{ notes: [330, 370, 415, 440, 494, 440, 415, 370], tempo: 0.22, wave: 'sine' },
+  odisha:    { notes: [293, 330, 370, 415, 440, 415, 370, 330], tempo: 0.24, wave: 'triangle' },
+  bihar:     { notes: [261, 294, 330, 392, 440, 392, 330, 294], tempo: 0.23, wave: 'sine' },
+  andhra:    { notes: [277, 311, 370, 415, 466, 415, 370, 311], tempo: 0.2, wave: 'sawtooth' },
+  telangana: { notes: [246, 277, 329, 370, 415, 370, 329, 277], tempo: 0.19, wave: 'sawtooth' },
+  karnataka: { notes: [261, 293, 329, 349, 392, 370, 329, 293], tempo: 0.21, wave: 'triangle' },
+  kerala:    { notes: [294, 330, 370, 415, 466, 415, 370, 330], tempo: 0.3, wave: 'sine' },
+  tamilnadu: { notes: [277, 311, 349, 392, 440, 392, 349, 311], tempo: 0.25, wave: 'triangle' },
+  assam:     { notes: [329, 370, 415, 466, 523, 466, 415, 370], tempo: 0.2, wave: 'sine' },
+  himachal:  { notes: [261, 294, 349, 392, 440, 392, 349, 294], tempo: 0.28, wave: 'triangle' },
+  uttarakhand:{ notes: [220, 247, 293, 329, 370, 329, 293, 247], tempo: 0.32, wave: 'sine' },
+  jharkhand: { notes: [246, 293, 329, 370, 415, 370, 329, 293], tempo: 0.25, wave: 'sawtooth' },
+  sikkim:    { notes: [330, 392, 440, 494, 523, 494, 440, 392], tempo: 0.28, wave: 'sine' },
+  manipur:   { notes: [293, 329, 370, 415, 466, 415, 370, 329], tempo: 0.3, wave: 'triangle' },
+  goa:       { notes: [349, 392, 440, 494, 523, 494, 440, 392], tempo: 0.18, wave: 'triangle' },
+};
+
+function playFolkTone(stateId) {
+  stopTone();
+  const ctx = getCtx();
+  gainNode = ctx.createGain();
+  gainNode.gain.setValueAtTime(0, ctx.currentTime);
+  gainNode.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.5);
+  gainNode.connect(ctx.destination);
+
+  const pattern = FOLK_PATTERNS[stateId] || FOLK_PATTERNS.up;
+  const { notes, tempo, wave } = pattern;
+
+  let time = ctx.currentTime + 0.3;
+  for (let loop = 0; loop < 6; loop++) {
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = wave;
+      osc.frequency.setValueAtTime(freq, time);
+      osc.connect(gainNode);
+      osc.start(time);
+      osc.stop(time + tempo * 0.85);
+      activeNodes.push(osc);
+      time += tempo;
+    });
+    time += tempo * 0.5;
+  }
+
+  gainNode.gain.setValueAtTime(0.12, time - 1);
+  gainNode.gain.linearRampToValueAtTime(0, time + 0.3);
+}
+
+function stopTone() {
+  if (gainNode) {
+    try {
+      gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+    } catch(e) {}
+  }
+  activeNodes.forEach(n => { try { n.stop(); } catch(e) {} });
+  activeNodes = [];
+}
+
+// ========== FILTERS ==========
+let currentRegion = 'all', currentSearch = '';
+
+function applyFilters() {
+  let filtered = STATES;
+  if (currentRegion !== 'all') filtered = filtered.filter(s => s.region === currentRegion);
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    filtered = filtered.filter(s => s.name.toLowerCase().includes(q) || s.crops.kharif.join(' ').toLowerCase().includes(q) || s.crops.other.join(' ').toLowerCase().includes(q));
+  }
+  renderCards(filtered);
+}
+
+document.querySelectorAll('.region-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.region-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentRegion = tab.dataset.region;
+    applyFilters();
+  });
+});
+
+document.getElementById('stateSearch').addEventListener('input', e => {
+  currentSearch = e.target.value;
+  applyFilters();
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+// INIT
+renderCards(STATES);
+</script>
+</body>
+</html>
