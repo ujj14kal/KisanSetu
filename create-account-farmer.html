@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Create Farmer Account | Kisan Setu</title>
+  <meta name="description" content="Create your verified farmer profile on Kisan Setu to find agricultural work opportunities.">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='90'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -96,6 +99,51 @@
   <link rel="stylesheet" href="auth.css">
 
   <style>
+    .farm-type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .farm-type-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f4f8f3;
+      border: 1.5px solid #d4e9d6;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #333;
+      user-select: none;
+    }
+    .farm-type-chip input[type="checkbox"] { display: none; }
+    .farm-type-chip:hover { border-color: #2e7d32; background: #eaf5eb; }
+    .farm-type-chip.selected {
+      background: #e8f5ee;
+      border-color: #2e7d32;
+      color: #1a6b2a;
+      font-weight: 600;
+    }
+    .farm-type-chip .chip-icon { font-size: 1.1rem; }
+    .farm-type-chip .chip-check {
+      margin-left: auto;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .farm-type-chip.selected .chip-check {
+      background: #2e7d32;
+      border-color: #2e7d32;
+      color: #fff;
+    }
     .otp-panel {
       background: #f6fbf7;
       border: 1.5px solid #c3e6cb;
@@ -250,14 +298,30 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Farm Type</label>
-          <select class="form-select" id="farmType" multiple required>
-            <option value="Crop Farming">Crop Farming</option>
-            <option value="Dairy">Dairy</option>
-            <option value="Mixed Farming">Mixed Farming</option>
-            <option value="Horticulture">Horticulture</option>
-          </select>
-          <small class="text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
+          <label class="form-label">Farm Type <span class="text-muted fw-normal" style="font-size:0.8rem;">(select all that apply)</span></label>
+          <div class="farm-type-grid" id="farmTypeGrid">
+            <label class="farm-type-chip" onclick="toggleFarmType(this)">
+              <input type="checkbox" value="Crop Farming">
+              <span class="chip-icon">🌾</span><span>Crop Farming</span>
+              <span class="chip-check">✓</span>
+            </label>
+            <label class="farm-type-chip" onclick="toggleFarmType(this)">
+              <input type="checkbox" value="Dairy">
+              <span class="chip-icon">🐄</span><span>Dairy</span>
+              <span class="chip-check">✓</span>
+            </label>
+            <label class="farm-type-chip" onclick="toggleFarmType(this)">
+              <input type="checkbox" value="Mixed Farming">
+              <span class="chip-icon">🌿</span><span>Mixed Farming</span>
+              <span class="chip-check">✓</span>
+            </label>
+            <label class="farm-type-chip" onclick="toggleFarmType(this)">
+              <input type="checkbox" value="Horticulture">
+              <span class="chip-icon">🌸</span><span>Horticulture</span>
+              <span class="chip-check">✓</span>
+            </label>
+          </div>
+          <small id="farmTypeError" class="text-danger d-none">Please select at least one farm type.</small>
         </div>
 
         <div class="mb-3">
@@ -314,6 +378,7 @@
   </div>
 </div>
 
+<script src="ks-utils.js"></script>
 <script>
 const supabaseClient = supabase.createClient(
   "https://kyujketzdhkbykybjywu.supabase.co",
@@ -321,21 +386,29 @@ const supabaseClient = supabase.createClient(
 );
 
 const isGoogle = new URLSearchParams(window.location.search).get("source") === "google";
-
 let usernameAvailable = false;
 
+function toggleFarmType(label) {
+  const cb = label.querySelector("input[type='checkbox']");
+  cb.checked = !cb.checked;
+  label.classList.toggle("selected", cb.checked);
+  document.getElementById("farmTypeError").classList.add("d-none");
+}
+
+function getSelectedFarmTypes() {
+  return Array.from(document.querySelectorAll("#farmTypeGrid input[type='checkbox']:checked")).map(cb => cb.value);
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
+  ksAddPasswordToggle("password");
+
   if (isGoogle) {
-    // ✅ Update heading for Google flow
     document.getElementById("pageHeading").textContent = "Complete Your Profile";
     document.getElementById("pageSubheading").textContent = "Just a few more details to get you started.";
-
-    // Hide username & password section
     document.getElementById("credentialsSection").style.display = "none";
     document.getElementById("username").removeAttribute("required");
     document.getElementById("password").removeAttribute("required");
 
-    // Auto-fill email from Google session (read-only)
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (user?.email) {
       const emailInput = document.getElementById("email");
@@ -360,26 +433,30 @@ async function checkUsernameAvailability() {
 
   if (data) {
     status.textContent = "Username already taken";
-    status.className = "text-danger";
+    status.className = "d-block mt-1 text-danger small";
     usernameAvailable = false;
   } else {
-    status.textContent = "Username available";
-    status.className = "text-success";
+    status.textContent = "✓ Username available";
+    status.className = "d-block mt-1 text-success small";
     usernameAvailable = true;
   }
 }
 
 function showReview() {
   if (!window.mobileVerified) {
-    alert("Please verify your mobile number first.");
+    showToast("Please verify your mobile number first.", "warning");
+    return;
+  }
+  const selectedFarmTypes = getSelectedFarmTypes();
+  if (selectedFarmTypes.length === 0) {
+    document.getElementById("farmTypeError").classList.remove("d-none");
+    showToast("Please select at least one farm type.", "warning");
     return;
   }
   if (!farmerForm.checkValidity()) {
     farmerForm.reportValidity();
     return;
   }
-
-  const selectedFarmTypes = Array.from(document.getElementById("farmType").selectedOptions).map(o => o.value);
 
   document.getElementById("rFullName").textContent = document.getElementById("fullName").value;
   document.getElementById("rUsername").textContent = isGoogle ? "—" : document.getElementById("username").value;
@@ -388,7 +465,6 @@ function showReview() {
   document.getElementById("rLocation").textContent = document.getElementById("userLocation").value;
   document.getElementById("rFarmType").textContent = selectedFarmTypes.join(", ");
   document.getElementById("rCrops").textContent = document.getElementById("crops").value || "—";
-
   document.getElementById("rUsernameRow").style.display = isGoogle ? "none" : "";
 
   new bootstrap.Modal(document.getElementById("reviewModal")).show();
@@ -396,23 +472,19 @@ function showReview() {
 
 async function confirmCreateAccount(event) {
   const btn = event.target;
-  btn.disabled = true;
-  btn.innerText = "Creating...";
+  ksSetBtnLoading(btn, "Creating account…");
 
   let userId;
 
   if (isGoogle) {
-    // Google user — get ID from existing session
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) {
-      alert("Session expired. Please sign in again.");
-      btn.disabled = false;
-      btn.innerText = "Confirm & Create";
+      showToast("Session expired. Please sign in again.", "error");
+      ksResetBtn(btn);
       return;
     }
     userId = user.id;
   } else {
-    // Normal signup — unchanged
     const { data: existing } = await supabaseClient
       .from("profiles")
       .select("id")
@@ -420,9 +492,8 @@ async function confirmCreateAccount(event) {
       .maybeSingle();
 
     if (existing) {
-      alert("Username already taken");
-      btn.disabled = false;
-      btn.innerText = "Confirm & Create";
+      showToast("Username already taken. Please choose another.", "error");
+      ksResetBtn(btn);
       return;
     }
 
@@ -432,16 +503,13 @@ async function confirmCreateAccount(event) {
     });
 
     if (error) {
-      alert(error.message);
-      btn.disabled = false;
-      btn.innerText = "Confirm & Create";
+      showToast(error.message, "error");
+      ksResetBtn(btn);
       return;
     }
-
     userId = data.user.id;
   }
 
-  // Aadhaar upload — unchanged
   const frontFile = document.getElementById("aadhaarFront").files[0];
   const backFile = document.getElementById("aadhaarBack").files[0];
   const userName = document.getElementById("fullName").value.trim().replace(/\s+/g, "_");
@@ -450,25 +518,19 @@ async function confirmCreateAccount(event) {
 
   const { error: frontError } = await supabaseClient.storage.from("documents").upload(frontPath, frontFile);
   if (frontError) {
-    alert("Aadhaar front upload failed: " + frontError.message);
-    btn.disabled = false;
-    btn.innerText = "Confirm & Create";
+    showToast("Aadhaar front upload failed: " + frontError.message, "error");
+    ksResetBtn(btn);
     return;
   }
 
   const { error: backError } = await supabaseClient.storage.from("documents").upload(backPath, backFile);
   if (backError) {
-    alert("Aadhaar back upload failed: " + backError.message);
-    btn.disabled = false;
-    btn.innerText = "Confirm & Create";
+    showToast("Aadhaar back upload failed: " + backError.message, "error");
+    ksResetBtn(btn);
     return;
   }
 
-  const selectedFarmTypes = Array.from(document.getElementById("farmType").selectedOptions).map(o => o.value);
-
-  // ✅ For Google users: INSERT a fresh profiles row (first time ever)
-  // ✅ For normal users: INSERT as before
-  // Both paths: only ONE insert, happens here for the first time
+  const selectedFarmTypes = getSelectedFarmTypes();
   const profileData = {
     id: userId,
     role: "farmer",
@@ -491,13 +553,11 @@ async function confirmCreateAccount(event) {
   const { error: insertError } = await supabaseClient.from("profiles").insert(profileData);
 
   if (insertError) {
-    alert("Profile creation failed: " + insertError.message);
-    btn.disabled = false;
-    btn.innerText = "Confirm & Create";
+    showToast("Profile creation failed: " + insertError.message, "error");
+    ksResetBtn(btn);
     return;
   }
 
-  // Redirect
   const redirectTarget = isGoogle ? "profile-farmer.html" : "login-farmer.html";
   document.getElementById("successName").textContent = document.getElementById("fullName").value;
   document.getElementById("successBtn").textContent = isGoogle ? "Go to Dashboard →" : "Go to Login →";
@@ -508,11 +568,8 @@ async function confirmCreateAccount(event) {
   const countdownEl = document.getElementById("successCountdown");
   const timer = setInterval(() => {
     seconds--;
-    countdownEl.textContent = `Redirecting in ${seconds} second${seconds !== 1 ? 's' : ''}...`;
-    if (seconds <= 0) {
-      clearInterval(timer);
-      window.location.href = redirectTarget;
-    }
+    countdownEl.textContent = `Redirecting in ${seconds} second${seconds !== 1 ? "s" : ""}...`;
+    if (seconds <= 0) { clearInterval(timer); window.location.href = redirectTarget; }
   }, 1000);
 }
 </script>

@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Create Landlord Account | Kisan Setu</title>
+  <meta name="description" content="Create your verified landlord profile on Kisan Setu to find and hire trusted farmers.">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='90'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -342,6 +345,7 @@
   </div>
 </div>
 
+<script src="ks-utils.js"></script>
 <script>
 const supabaseClient = supabase.createClient(
   "https://kyujketzdhkbykybjywu.supabase.co",
@@ -349,21 +353,18 @@ const supabaseClient = supabase.createClient(
 );
 
 const isGoogle = new URLSearchParams(window.location.search).get("source") === "google";
-
 let usernameAvailable = false;
 
 window.addEventListener("DOMContentLoaded", async () => {
+  ksAddPasswordToggle("password");
+
   if (isGoogle) {
-    // ✅ Update heading for Google flow
     document.getElementById("pageHeading").textContent = "Complete Your Profile";
     document.getElementById("pageSubheading").textContent = "Just a few more details to get you started.";
-
-    // Hide username & password section
     document.getElementById("credentialsSection").style.display = "none";
     document.getElementById("username").removeAttribute("required");
     document.getElementById("password").removeAttribute("required");
 
-    // Auto-fill email from Google session (read-only)
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (user?.email) {
       const emailInput = document.getElementById("email");
@@ -381,25 +382,22 @@ async function checkUsernameAvailability() {
   if (!uname) return;
 
   const { data } = await supabaseClient
-    .from("profiles")
-    .select("id")
-    .eq("username", uname)
-    .maybeSingle();
+    .from("profiles").select("id").eq("username", uname).maybeSingle();
 
   if (data) {
     status.textContent = "Username already taken";
-    status.className = "text-danger";
+    status.className = "d-block mt-1 text-danger small";
     usernameAvailable = false;
   } else {
-    status.textContent = "Username available";
-    status.className = "text-success";
+    status.textContent = "✓ Username available";
+    status.className = "d-block mt-1 text-success small";
     usernameAvailable = true;
   }
 }
 
 function showReview() {
   if (!window.mobileVerified) {
-    alert("Please verify your mobile number first.");
+    showToast("Please verify your mobile number first.", "warning");
     return;
   }
   if (!workerForm.checkValidity()) {
@@ -407,17 +405,16 @@ function showReview() {
     return;
   }
 
-  rName.textContent = document.getElementById("fullName").value;
-  rUsername.textContent = isGoogle ? "—" : document.getElementById("username").value;
-  rEmail.textContent = document.getElementById("email").value;
-  rMobile.textContent = document.getElementById("mobile").value;
-  rLocation.textContent = document.getElementById("userLocation").value;
-  rLandLocation.textContent = document.getElementById("landLocation").value;
-  rWork.textContent = document.getElementById("work").value;
-  rLandSize.textContent = document.getElementById("landSize").value;
-  rWorkNeeded.textContent = document.getElementById("workNeeded").value;
-  rBudget.textContent = document.getElementById("budget").value;
-
+  document.getElementById("rName").textContent = document.getElementById("fullName").value;
+  document.getElementById("rUsername").textContent = isGoogle ? "—" : document.getElementById("username").value;
+  document.getElementById("rEmail").textContent = document.getElementById("email").value;
+  document.getElementById("rMobile").textContent = document.getElementById("mobile").value;
+  document.getElementById("rLocation").textContent = document.getElementById("userLocation").value;
+  document.getElementById("rLandLocation").textContent = document.getElementById("landLocation").value;
+  document.getElementById("rWork").textContent = document.getElementById("work").value;
+  document.getElementById("rLandSize").textContent = document.getElementById("landSize").value;
+  document.getElementById("rWorkNeeded").textContent = document.getElementById("workNeeded").value;
+  document.getElementById("rBudget").textContent = document.getElementById("budget").value;
   document.getElementById("rUsernameRow").style.display = isGoogle ? "none" : "";
 
   new bootstrap.Modal(document.getElementById("reviewModal")).show();
@@ -425,39 +422,31 @@ function showReview() {
 
 async function confirmCreateWorker(event) {
   const btn = event.target;
-  btn.disabled = true;
-  btn.innerText = "Creating...";
+  ksSetBtnLoading(btn, "Creating account…");
 
   let userId;
 
   if (isGoogle) {
-    // Google user — get ID from existing session
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) {
-      alert("Session expired. Please sign in again.");
-      btn.disabled = false;
-      btn.innerText = "Confirm & Create";
+      showToast("Session expired. Please sign in again.", "error");
+      ksResetBtn(btn);
       return;
     }
     userId = user.id;
   } else {
-    // Normal signup — unchanged
     const { data, error } = await supabaseClient.auth.signUp({
       email: document.getElementById("email").value,
       password: document.getElementById("password").value
     });
-
     if (error || !data.user) {
-      alert("Signup failed: " + (error?.message || "Unknown error"));
-      btn.disabled = false;
-      btn.innerText = "Confirm & Create";
+      showToast("Signup failed: " + (error?.message || "Unknown error"), "error");
+      ksResetBtn(btn);
       return;
     }
-
     userId = data.user.id;
   }
 
-  // Aadhaar upload — unchanged
   const frontFile = document.getElementById("aadhaarFront").files[0];
   const backFile = document.getElementById("aadhaarBack").files[0];
   const userName = document.getElementById("fullName").value.trim().replace(/\s+/g, "_");
@@ -466,23 +455,18 @@ async function confirmCreateWorker(event) {
 
   const { error: frontError } = await supabaseClient.storage.from("documents").upload(frontPath, frontFile);
   if (frontError) {
-    alert("Aadhaar front upload failed: " + frontError.message);
-    btn.disabled = false;
-    btn.innerText = "Confirm & Create";
+    showToast("Aadhaar front upload failed: " + frontError.message, "error");
+    ksResetBtn(btn);
     return;
   }
 
   const { error: backError } = await supabaseClient.storage.from("documents").upload(backPath, backFile);
   if (backError) {
-    alert("Aadhaar back upload failed: " + backError.message);
-    btn.disabled = false;
-    btn.innerText = "Confirm & Create";
+    showToast("Aadhaar back upload failed: " + backError.message, "error");
+    ksResetBtn(btn);
     return;
   }
 
-  // ✅ For Google users: INSERT a fresh profiles row (first time ever)
-  // ✅ For normal users: INSERT as before
-  // Both paths: only ONE insert, happens here for the first time
   const profileData = {
     id: userId,
     role: "worker",
@@ -500,21 +484,15 @@ async function confirmCreateWorker(event) {
     aadhaar_back: backPath,
     onboarding_completed: true
   };
-
-  if (!isGoogle) {
-    profileData.username = document.getElementById("username").value;
-  }
+  if (!isGoogle) profileData.username = document.getElementById("username").value;
 
   const { error: insertError } = await supabaseClient.from("profiles").insert(profileData);
-
   if (insertError) {
-    alert("Profile creation failed: " + insertError.message);
-    btn.disabled = false;
-    btn.innerText = "Confirm & Create";
+    showToast("Profile creation failed: " + insertError.message, "error");
+    ksResetBtn(btn);
     return;
   }
 
-  // Redirect
   const redirectTarget = isGoogle ? "profile-worker.html" : "login-worker.html";
   document.getElementById("successName").textContent = document.getElementById("fullName").value;
   document.getElementById("successBtn").textContent = isGoogle ? "Go to Dashboard →" : "Go to Login →";
@@ -525,11 +503,8 @@ async function confirmCreateWorker(event) {
   const countdownEl = document.getElementById("successCountdown");
   const timer = setInterval(() => {
     seconds--;
-    countdownEl.textContent = `Redirecting in ${seconds} second${seconds !== 1 ? 's' : ''}...`;
-    if (seconds <= 0) {
-      clearInterval(timer);
-      window.location.href = redirectTarget;
-    }
+    countdownEl.textContent = `Redirecting in ${seconds} second${seconds !== 1 ? "s" : ""}...`;
+    if (seconds <= 0) { clearInterval(timer); window.location.href = redirectTarget; }
   }, 1000);
 }
 </script>
