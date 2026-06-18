@@ -3,33 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kisan Setu — Connecting Farmers & Landlords</title>
-<meta name="description" content="Kisan Setu connects verified farmers with trusted agricultural landlords across India. Aadhaar-verified profiles, secure hiring, and transparent work history.">
-<meta property="og:title" content="Kisan Setu — Connecting Farmers & Landlords">
-<meta property="og:description" content="Find verified farming jobs or hire trusted farmers on Kisan Setu. Aadhaar-verified, mobile-first, designed for rural India.">
+<title>Kisan Setu — Agricultural Employment Platform</title>
+<meta name="description" content="Kisan Setu connects verified farmers with agricultural landlords across India. Aadhaar-verified profiles, direct hiring, no agents.">
+<meta property="og:title" content="Kisan Setu — Agricultural Employment Platform">
+<meta property="og:description" content="Find farm work or hire verified farmers directly. No agents, no commissions, Aadhaar-backed trust.">
 <meta property="og:type" content="website">
-
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='90'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E">
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="Home.css">
-
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top ks-nav">
   <div class="container">
-    <a class="navbar-brand fw-bold text-success" href="index.html">🌾 Kisan Setu</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+    <a class="navbar-brand ks-brand" href="index.html">🌾 Kisan Setu</a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="nav">
-      <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item"><a class="nav-link" href="info.html">Info</a></li>
-        <li class="nav-item"><a class="nav-link" href="process.html">Process</a></li>
-        <li class="nav-item"><a class="nav-link" href="support.html">Support</a></li>
-        <li class="nav-item dropdown ms-lg-3">
+      <ul class="navbar-nav ms-auto align-items-center gap-1">
+        <li class="nav-item"><a class="nav-link ks-nav-link" href="info.html">Info</a></li>
+        <li class="nav-item"><a class="nav-link ks-nav-link" href="process.html">Process</a></li>
+        <li class="nav-item"><a class="nav-link ks-nav-link" href="support.html">Support</a></li>
+        <li class="nav-item dropdown ms-2">
           <a class="btn btn-success px-4 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Login</a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="login-farmer.html">🌾 Login as Farmer</a></li>
@@ -41,196 +37,202 @@
   </div>
 </nav>
 
-<!-- HERO SECTION -->
-<section class="hero-section mb-5">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-md-6">
-        <h1 class="fw-bold mb-3">
-          Connecting Farmers to Verified Agricultural Landlords
-        </h1>
-        <p class="mb-4">
-          Farmers can find verified agricultural landlords, and landlords can find trusted, verified farmers — all on Kisan Setu.
-        </p>
-        <div class="d-flex flex-wrap gap-3">
-          <a href="login-farmer.html" class="btn btn-success btn-lg px-5">🌾 I'm a Farmer</a>
-          <a href="login-worker.html" class="btn btn-outline-success btn-lg px-5" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.6);color:#fff;">🏡 I'm a Landlord</a>
-        </div>
-        <div class="d-flex gap-4 mt-4" style="opacity:0;animation:heroFadeUp 0.8s ease 0.75s forwards;">
-          <div style="color:rgba(255,255,255,0.85);font-size:0.88rem;"><span style="font-size:1.2rem;font-weight:800;color:#fff;display:block;">500+</span>Verified Farmers</div>
-          <div style="color:rgba(255,255,255,0.85);font-size:0.88rem;"><span style="font-size:1.2rem;font-weight:800;color:#fff;display:block;">28</span>States Covered</div>
-          <div style="color:rgba(255,255,255,0.85);font-size:0.88rem;"><span style="font-size:1.2rem;font-weight:800;color:#fff;display:block;">100%</span>Aadhaar Verified</div>
-        </div>
-      </div>
-      <div class="col-md-6 text-center d-none d-md-block">
-        <img
-          src="Assets/Images/Farming.png"
-          alt="Farmers and landlords illustration"
-          class="hero-right-image"
-        />
+<!-- HERO -->
+<section class="ks-hero">
+  <div class="ks-hero-overlay"></div>
+  <div class="container h-100">
+    <div class="ks-hero-inner">
+      <span class="ks-eyebrow">Agricultural Employment Platform</span>
+      <h1 class="ks-hero-h1">Find Work.<br>Hire Farmers.<br>No Middlemen.</h1>
+      <p class="ks-hero-sub">Kisan Setu connects verified farmers with agricultural landlords through Aadhaar-backed profiles — direct, transparent, and free from agents.</p>
+      <div class="ks-hero-ctas">
+        <a href="login-farmer.html" class="ks-cta-primary">I'm a Farmer</a>
+        <a href="login-worker.html" class="ks-cta-ghost">I'm a Landlord</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
-
-<section class="features-section">
-<div class="container">
-
-<div class="text-center mb-5">
-<h2 class="fw-bold">Why Kisan Setu?</h2>
-<p class="text-muted">Built for trust, privacy, and simplicity</p>
-</div>
-
-<div class="row g-4">
-
-<div class="col-md-3">
-<div class="feature-card text-center">
-<div class="feature-icon">✔</div>
-<h5>Aadhaar Verified</h5>
-<p>All landlords verified via OTP & Aadhaar</p>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="feature-card text-center">
-<div class="feature-icon">🔒</div>
-<h5>Privacy First</h5>
-<p>Partial profile visibility by default</p>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="feature-card text-center">
-<div class="feature-icon">📋</div>
-<h5>Hiring History</h5>
-<p>Transparent work records</p>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="feature-card text-center">
-<div class="feature-icon">📱</div>
-<h5>Simple to Use</h5>
-<p>Mobile-first, farmer-friendly design</p>
-</div>
-</div>
-
-</div>
-</div>
-</section>
-
-<!-- STORY TESTIMONIALS -->
-
-<section class="story-wrapper">
-
-<div class="story-scroll">
-
-<section class="story-slide farmer bg-1">
-<div class="story-content">
-<span class="role farmer">Farmer</span>
-<p>“Kisan Setu helped me find reliable landlords during harvest season.”</p>
-<div class="stars">★★★★★</div>
-<h4>Ramesh Yadav</h4>
-<small>Haryana</small>
-<div class="scroll-hint">↓ Scroll</div>
-</div>
-</section>
-
-<section class="story-slide worker bg-2">
-<div class="story-content">
-<span class="role worker">Landlord</span>
-<p>“Now farmers trust me because my profile is verified.”</p>
-<div class="stars">★★★★★</div>
-<h4>Sunita Devi</h4>
-<small>Bihar</small>
-<div class="scroll-hint">↓ Scroll</div>
-</div>
-</section>
-
-<section class="story-slide farmer bg-3">
-<div class="story-content">
-<span class="role farmer">Farmer</span>
-<p>“Hiring history helps me rehire trusted landlords easily.”</p>
-<div class="stars">★★★★☆</div>
-<h4>Balwant Singh</h4>
-<small>Punjab</small>
-<div class="scroll-hint">↓ Scroll</div>
-</div>
-</section>
-
-<section class="story-slide farmer bg-4">
-<div class="story-content">
-<span class="role worker">Landlord</span>
-<p>“Kisan Setu made it very easy for me to find verified farmers during the harvesting season.”</p>
-<div class="stars">★★★★★</div>
-<h4>Piyush Verma</h4>
-<small>Punjab</small>
-<div class="scroll-hint">↓ Scroll</div>
-</div>
-</section>
-
-<section class="story-slide worker bg-5">
-<div class="story-content">
-<span class="role farmer">Farmer</span>
-<p>“The system feels safe and transparent, and I get work based on my experience.”</p>
-<div class="stars">★★★★☆</div>
-<h4>Suresh Pal</h4>
-<small>Karnataka</small>
-<div class="scroll-hint">↓ Scroll</div>
-</div>
-</section>
-
-</div>
-</section>
-
-<!-- PRE FOOTER -->
-<section class="pre-footer">
+<!-- HOW IT WORKS -->
+<section class="ks-how">
   <div class="container">
-    <div class="row align-items-start">
-      <div class="col-md-8">
-        <div class="footer-links-grid">
-          <ul>
-            <li><a href="process.html">How It Works</a></li>
-            <li><a href="info.html">Agricultural Info</a></li>
-            <li><a href="support.html">Support</a></li>
-          </ul>
-          <ul>
-            <li><a href="login-farmer.html">Farmer Login</a></li>
-            <li><a href="login-worker.html">Landlord Login</a></li>
-            <li><a href="support.html">Contact Us</a></li>
-          </ul>
+    <div class="ks-section-header">
+      <span class="ks-section-label">How It Works</span>
+      <h2>Simple for everyone</h2>
+      <p>Two roles, one platform. Farmers get found, landlords hire directly.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="ks-role-card">
+          <div class="ks-role-tag farmer-tag">For Farmers</div>
+          <h3 class="ks-role-title">Get hired directly</h3>
+          <p class="ks-role-sub">Showcase your skills and availability, get discovered by verified employers, and build a credible work history — no agent fees, ever.</p>
+          <div class="ks-steps">
+            <div class="ks-step">
+              <span class="ks-step-num">01</span>
+              <div class="ks-step-body">
+                <strong>Create your profile</strong>
+                <p>Sign up with your mobile number. Add your skills, location, and availability in minutes.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">02</span>
+              <div class="ks-step-body">
+                <strong>Verify with Aadhaar</strong>
+                <p>OTP-based identity verification builds trust with employers and confirms your profile is genuine.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">03</span>
+              <div class="ks-step-body">
+                <strong>Accept or decline requests</strong>
+                <p>Landlords send you hiring requests. Review each one from your dashboard and decide on your terms.</p>
+              </div>
+            </div>
+          </div>
+          <a href="login-farmer.html" class="ks-role-cta farmer-cta">Get started as a farmer →</a>
         </div>
       </div>
-      <div class="col-md-4 text-md-end text-center mt-3 mt-md-0">
-        <a href="#" class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">↑ Back to top</a>
+
+      <div class="col-lg-6">
+        <div class="ks-role-card landlord-role-card">
+          <div class="ks-role-tag landlord-tag">For Landlords</div>
+          <h3 class="ks-role-title">Hire with confidence</h3>
+          <p class="ks-role-sub">Search verified farmer profiles by location and skill. Send direct hiring requests without going through any agent or broker.</p>
+          <div class="ks-steps">
+            <div class="ks-step">
+              <span class="ks-step-num">01</span>
+              <div class="ks-step-body">
+                <strong>Register and verify</strong>
+                <p>Create your account and complete Aadhaar verification to access farmer profiles.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">02</span>
+              <div class="ks-step-body">
+                <strong>Search by location</strong>
+                <p>Filter farmer profiles by district, skill type, and availability to find the right match for your land.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">03</span>
+              <div class="ks-step-body">
+                <strong>Send a hiring request</strong>
+                <p>Contact farmers directly through the platform. Once accepted, communicate via in-app chat.</p>
+              </div>
+            </div>
+          </div>
+          <a href="login-worker.html" class="ks-role-cta landlord-cta">Get started as a landlord →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST PILLARS -->
+<section class="ks-trust">
+  <div class="container">
+    <div class="ks-section-header light">
+      <span class="ks-section-label light">Why Kisan Setu</span>
+      <h2>Built around trust</h2>
+      <p>Every design decision on this platform was made to protect farmers and landlords from exploitation.</p>
+    </div>
+    <div class="ks-trust-grid">
+
+      <div class="ks-trust-card">
+        <div class="ks-trust-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
+        <h4>Aadhaar-verified profiles</h4>
+        <p>Every user verifies their identity via Aadhaar OTP before their profile becomes visible. No fake accounts, no anonymous actors.</p>
+      </div>
+
+      <div class="ks-trust-card">
+        <div class="ks-trust-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+            <line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/>
+          </svg>
+        </div>
+        <h4>No agents, no commissions</h4>
+        <p>Farmers and landlords communicate directly on the platform. There are no brokers taking a cut from either side.</p>
+      </div>
+
+      <div class="ks-trust-card">
+        <div class="ks-trust-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <line x1="10" y1="9" x2="8" y2="9"/>
+          </svg>
+        </div>
+        <h4>Transparent job history</h4>
+        <p>Every accepted request is recorded. Farmers build credibility over time. Landlords can see a farmer's track record before hiring.</p>
+      </div>
+
+      <div class="ks-trust-card">
+        <div class="ks-trust-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <h4>In-app chat after hiring</h4>
+        <p>Once a request is accepted, both parties can communicate through encrypted in-platform chat — no need to share personal numbers.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="ks-cta-band">
+  <div class="container">
+    <div class="ks-cta-band-inner">
+      <div class="ks-cta-band-text">
+        <h2>Ready to get started?</h2>
+        <p>Free for farmers. Simple subscription for landlords.</p>
+      </div>
+      <div class="ks-cta-band-btns">
+        <a href="login-farmer.html" class="btn btn-light fw-semibold px-5">Join as Farmer</a>
+        <a href="login-worker.html" class="btn btn-outline-light fw-semibold px-5">Join as Landlord</a>
       </div>
     </div>
   </div>
 </section>
 
 <!-- FOOTER -->
-
-<footer class="site-footer">
-<div class="container">
-<div class="footer-content">
-
-<p class="footer-text">
-© 2026 Kisan Setu. All rights reserved.
-</p>
-
-<p class="footer-brand">
-🌾 <strong>Kisan Setu</strong>
-</p>
-
-</div>
-</div>
+<footer class="ks-footer-new">
+  <div class="container">
+    <div class="ks-footer-grid">
+      <div class="ks-footer-about">
+        <span class="ks-footer-brand">🌾 Kisan Setu</span>
+        <p>Agricultural employment,<br>direct and verified.</p>
+      </div>
+      <div class="ks-footer-col">
+        <h6>Platform</h6>
+        <a href="process.html">How It Works</a>
+        <a href="info.html">Agricultural Info</a>
+        <a href="support.html">Support</a>
+      </div>
+      <div class="ks-footer-col">
+        <h6>Account</h6>
+        <a href="login-farmer.html">Farmer Login</a>
+        <a href="login-worker.html">Landlord Login</a>
+      </div>
+    </div>
+    <div class="ks-footer-bottom">
+      <p>© 2026 Kisan Setu. All rights reserved.</p>
+    </div>
+  </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="ks-utils.js"></script>
 </body>
 </html>
-
-
