@@ -5,33 +5,147 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Support | Kisan Setu</title>
   <meta name="description" content="Get help and support for Kisan Setu. Contact us for any questions about farmer or landlord accounts.">
-
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='90'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E">
-
-  <!-- Common Styles -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="Home.css">
-  <link rel="stylesheet" href="auth.css">
-  <link rel="stylesheet" href="support.css">
+  <style>
+    .support-hero {
+      background: linear-gradient(135deg, #091509 0%, #122515 35%, #1a4d1e 65%, #2e7d32 100%);
+      color: #fff;
+      padding: 88px 0 64px;
+      text-align: center;
+    }
+    .support-hero .ks-eyebrow {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.22);
+    }
+    .support-hero h1 {
+      font-family: 'Baloo 2', system-ui, sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin: 16px 0 14px;
+    }
+    .support-hero p {
+      font-size: 1rem;
+      color: rgba(255,255,255,.72);
+      max-width: 460px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .support-section {
+      padding: 64px 0 80px;
+      background: var(--g-bg);
+    }
+
+    .support-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 36px 32px;
+      box-shadow: 0 4px 24px rgba(26,77,30,.07);
+      border: 1px solid #e8f0ea;
+    }
+    .support-card h4 {
+      font-family: 'Baloo 2', system-ui, sans-serif;
+      font-weight: 700;
+      color: var(--g-dark);
+      margin-bottom: 24px;
+    }
+    .support-card .form-label {
+      font-weight: 600;
+      font-size: .88rem;
+      color: #444;
+    }
+    .support-card .form-control,
+    .support-card .form-select {
+      border-radius: 10px;
+      border-color: #d8e8dc;
+      font-size: .95rem;
+      padding: 10px 14px;
+    }
+    .support-card .form-control:focus,
+    .support-card .form-select:focus {
+      border-color: var(--g-primary);
+      box-shadow: 0 0 0 3px rgba(46,125,50,.1);
+    }
+
+    .contact-card {
+      background: var(--g-dark);
+      border-radius: 20px;
+      padding: 36px 32px;
+      color: rgba(255,255,255,.85);
+      height: 100%;
+    }
+    .contact-card h5 {
+      font-family: 'Baloo 2', system-ui, sans-serif;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 28px;
+      font-size: 1.15rem;
+    }
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .contact-item:last-child { margin-bottom: 0; }
+    .contact-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #a5d6a7;
+    }
+    .contact-item strong {
+      display: block;
+      color: #fff;
+      font-size: .88rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .contact-item span {
+      font-size: .88rem;
+      color: rgba(255,255,255,.65);
+      line-height: 1.6;
+    }
+
+    .support-alert-success {
+      background: #e8f5ee;
+      border: 1px solid #a5d6a7;
+      border-radius: 12px;
+      color: #1a4d1e;
+      padding: 14px 18px;
+      font-size: .92rem;
+      font-weight: 500;
+    }
+
+    @media (max-width: 767px) {
+      .support-hero h1 { font-size: 2rem; }
+      .support-card, .contact-card { padding: 24px 20px; }
+    }
+  </style>
 </head>
 <body>
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top ks-nav">
   <div class="container">
-    <a class="navbar-brand fw-bold text-success" href="index.html">🌾 Kisan Setu</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+    <a class="navbar-brand ks-brand" href="index.html">🌾 Kisan Setu</a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item"><a class="nav-link" href="info.html">Info</a></li>
-        <li class="nav-item"><a class="nav-link" href="process.html">Process</a></li>
-        <li class="nav-item"><a class="nav-link active fw-semibold" href="support.html">Support</a></li>
-        <li class="nav-item dropdown ms-lg-3">
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-center gap-1">
+        <li class="nav-item"><a class="nav-link ks-nav-link" href="info.html">Info</a></li>
+        <li class="nav-item"><a class="nav-link ks-nav-link" href="process.html">Process</a></li>
+        <li class="nav-item"><a class="nav-link ks-nav-link active fw-semibold" href="support.html">Support</a></li>
+        <li class="nav-item dropdown ms-2">
           <a class="btn btn-success px-4 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Login</a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="login-farmer.html">🌾 Login as Farmer</a></li>
@@ -43,40 +157,35 @@
   </div>
 </nav>
 
-<!-- SUPPORT HERO -->
+<!-- HERO -->
 <section class="support-hero">
-  <div class="container text-center">
-    <h1 class="fw-bold">Support & Assistance</h1>
-    <p class="text-muted mt-2">
-      We’re here to help you with any questions or concerns
-    </p>
+  <div class="container">
+    <span class="ks-eyebrow">We're here to help</span>
+    <h1>Support & Assistance</h1>
+    <p>Having trouble? Raise a query and our team will get back to you within 24 hours.</p>
   </div>
 </section>
 
 <!-- SUPPORT CONTENT -->
 <section class="support-section">
   <div class="container">
-    <div class="row g-5 align-items-start">
+    <div class="row g-4 align-items-start">
 
-      <!-- SUPPORT FORM -->
-      <div class="col-md-7">
+      <!-- FORM -->
+      <div class="col-lg-7">
         <div class="support-card">
-
-          <h4 class="mb-3">Raise a Query</h4>
-
+          <h4>Raise a Query</h4>
           <form id="supportForm" novalidate onsubmit="handleSupportSubmit(event)">
             <div class="mb-3">
-              <label class="form-label fw-semibold">Your Name</label>
+              <label class="form-label">Your Name</label>
               <input type="text" class="form-control" id="supportName" placeholder="Ramesh Kumar" required>
             </div>
-
             <div class="mb-3">
-              <label class="form-label fw-semibold">Email Address</label>
+              <label class="form-label">Email Address</label>
               <input type="email" class="form-control" id="supportEmail" placeholder="yourname@example.com" required>
             </div>
-
             <div class="mb-3">
-              <label class="form-label fw-semibold">Category</label>
+              <label class="form-label">Category</label>
               <select class="form-select" id="supportCategory" required>
                 <option value="">Select a category</option>
                 <option>Account / Login Issue</option>
@@ -87,82 +196,105 @@
                 <option>Other</option>
               </select>
             </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Your Query</label>
-              <textarea class="form-control" id="supportMessage" rows="5" placeholder="Describe your issue or question here..." required></textarea>
+            <div class="mb-4">
+              <label class="form-label">Your Query</label>
+              <textarea class="form-control" id="supportMessage" rows="5" placeholder="Describe your issue or question in detail…" required></textarea>
             </div>
-
-            <div id="supportSuccess" class="alert alert-success d-none" style="border-radius:12px;">
-              ✅ Your query has been submitted! We'll get back to you within 24 hours.
+            <div id="supportSuccess" class="support-alert-success d-none mb-3">
+              Query submitted — we'll get back to you within 24 hours.
             </div>
-
-            <button type="submit" id="supportBtn" class="btn btn-success px-4">
+            <button type="submit" id="supportBtn" class="btn btn-success px-5">
               Submit Query
             </button>
           </form>
-
         </div>
       </div>
 
-      <!-- CONTACT DETAILS -->
-      <div class="col-md-5">
+      <!-- CONTACT -->
+      <div class="col-lg-5">
         <div class="contact-card">
+          <h5>Contact Information</h5>
 
-          <h5 class="mb-3">Contact Information</h5>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div>
+              <strong>Office Address</strong>
+              <span>Kisan Setu Technologies Pvt. Ltd.<br>Plot No. 21, Agri Tech Park,<br>Sector 62, Noida, UP – 201309</span>
+            </div>
+          </div>
 
-          <p>
-            <strong>Office Address</strong><br>
-            Kisan Setu Technologies Pvt. Ltd.<br>
-            Plot No. 21, Agri Tech Park,<br>
-            Sector 62, Noida, Uttar Pradesh – 201309
-          </p>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </div>
+            <div>
+              <strong>Helpline</strong>
+              <span>+91 98765 43210<br>+91 91234 56789</span>
+            </div>
+          </div>
 
-          <p class="mt-3">
-            <strong>Helpline Numbers</strong><br>
-            +91 98765 43210<br>
-            +91 91234 56789
-          </p>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div>
+              <strong>Email Support</strong>
+              <span>support@kisansetu.in</span>
+            </div>
+          </div>
 
-          <p class="mt-3">
-            <strong>Email Support</strong><br>
-            support@kisansetu.in
-          </p>
-
+          <div class="contact-item">
+            <div class="contact-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div>
+              <strong>Response Time</strong>
+              <span>Within 24 hours on working days (Mon–Sat, 9 am – 6 pm)</span>
+            </div>
+          </div>
         </div>
       </div>
 
-    </div>
-  </div>
-</section>
-
-<!-- PRE-FOOTER -->
-<section class="pre-footer">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-3 offset-md-1">
-        <ul class="list-unstyled">
-          <li><a href="process.html">How It Works</a></li>
-          <li><a href="info.html">Agricultural Info</a></li>
-          <li><a href="support.html">Support</a></li>
-        </ul>
-      </div>
-      <div class="col-md-3">
-        <ul class="list-unstyled">
-          <li><a href="login-farmer.html">Farmer Login</a></li>
-          <li><a href="login-worker.html">Landlord Login</a></li>
-          <li><a href="index.html">Home</a></li>
-        </ul>
-      </div>
     </div>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer class="site-footer">
-  <div class="container footer-content">
-    <p class="footer-text">© 2026 Kisan Setu. All rights reserved.</p>
-    <p class="footer-brand">🌾 <strong>Kisan Setu</strong></p>
+<footer class="ks-footer-new">
+  <div class="container">
+    <div class="ks-footer-grid">
+      <div class="ks-footer-about">
+        <span class="ks-footer-brand">🌾 Kisan Setu</span>
+        <p>Agricultural employment,<br>direct and verified.</p>
+      </div>
+      <div class="ks-footer-col">
+        <h6>Platform</h6>
+        <a href="process.html">How It Works</a>
+        <a href="info.html">Agricultural Info</a>
+        <a href="support.html">Support</a>
+      </div>
+      <div class="ks-footer-col">
+        <h6>Account</h6>
+        <a href="login-farmer.html">Farmer Login</a>
+        <a href="login-worker.html">Landlord Login</a>
+      </div>
+    </div>
+    <div class="ks-footer-bottom">
+      <p>© 2026 Kisan Setu. All rights reserved.</p>
+    </div>
   </div>
 </footer>
 
@@ -182,8 +314,8 @@ function handleSupportSubmit(e) {
     form.reset();
     ksResetBtn(btn);
     btn.disabled = true;
-    btn.textContent = "Query Submitted ✓";
-    btn.style.background = "#2e7d32";
+    btn.textContent = "Query Submitted";
+    btn.style.opacity = ".6";
   }, 900);
 }
 </script>

@@ -5,33 +5,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>How It Works | Kisan Setu</title>
   <meta name="description" content="Learn how Kisan Setu works for farmers and landlords — verified profiles, secure hiring, and transparent job history.">
-
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='90'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E">
-
-  <!-- Common Styles -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="Home.css">
-  <link rel="stylesheet" href="auth.css">
-  <link rel="stylesheet" href="process.css">
+  <style>
+    .proc-hero {
+      background: linear-gradient(135deg, #091509 0%, #122515 35%, #1a4d1e 65%, #2e7d32 100%);
+      color: #fff;
+      padding: 88px 0 64px;
+      text-align: center;
+    }
+    .proc-hero .ks-eyebrow {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.22);
+    }
+    .proc-hero h1 {
+      font-family: 'Baloo 2', system-ui, sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin: 16px 0 14px;
+    }
+    .proc-hero p {
+      font-size: 1rem;
+      color: rgba(255,255,255,.72);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    .proc-guarantee {
+      background: var(--g-dark);
+      padding: 56px 0;
+    }
+    .proc-guarantee-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .proc-guarantee-item {
+      text-align: center;
+      color: rgba(255,255,255,.85);
+    }
+    .proc-guarantee-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      color: #a5d6a7;
+    }
+    .proc-guarantee-item h5 {
+      font-family: 'Baloo 2', system-ui, sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .proc-guarantee-item p {
+      font-size: .85rem;
+      color: rgba(255,255,255,.6);
+      margin: 0;
+      line-height: 1.6;
+    }
+    @media (max-width: 767px) {
+      .proc-hero h1 { font-size: 2rem; }
+      .proc-guarantee-grid { grid-template-columns: 1fr; gap: 20px; }
+    }
+    @media (max-width: 991px) {
+      .proc-guarantee-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top ks-nav">
   <div class="container">
-    <a class="navbar-brand fw-bold text-success" href="index.html">🌾 Kisan Setu</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+    <a class="navbar-brand ks-brand" href="index.html">🌾 Kisan Setu</a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item"><a class="nav-link" href="info.html">Info</a></li>
-        <li class="nav-item"><a class="nav-link active fw-semibold" href="process.html">Process</a></li>
-        <li class="nav-item"><a class="nav-link" href="support.html">Support</a></li>
-        <li class="nav-item dropdown ms-lg-3">
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-center gap-1">
+        <li class="nav-item"><a class="nav-link ks-nav-link" href="info.html">Info</a></li>
+        <li class="nav-item"><a class="nav-link ks-nav-link active fw-semibold" href="process.html">Process</a></li>
+        <li class="nav-item"><a class="nav-link ks-nav-link" href="support.html">Support</a></li>
+        <li class="nav-item dropdown ms-2">
           <a class="btn btn-success px-4 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Login</a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="login-farmer.html">🌾 Login as Farmer</a></li>
@@ -44,157 +106,213 @@
 </nav>
 
 <!-- HERO -->
-<section class="process-hero">
-  <div class="container text-center">
-    <h1 class="fw-bold">How Kisan Setu Works</h1>
-    <p class="text-muted mt-2">
-      A transparent, secure process for verified farm work opportunities
-    </p>
+<section class="proc-hero">
+  <div class="container">
+    <span class="ks-eyebrow">Platform Guide</span>
+    <h1>How Kisan Setu Works</h1>
+    <p>Two roles, one transparent process. Here's exactly what happens from sign-up to hire — no hidden steps, no agents.</p>
   </div>
 </section>
 
-<!-- FARMER PROCESS -->
-<section class="process-section">
+<!-- STEP PANELS -->
+<section class="ks-how">
   <div class="container">
-
-    <h2 class="section-title">For Farmers (Job Seekers)</h2>
-    <p class="section-intro">
-      Farmers and agricultural landlords can create a verified profile on Kisan Setu and get hired
-      by trusted employers without intermediaries.
-    </p>
-
-    <div class="process-step">
-      <h5>1. Create Your Account</h5>
-      <p>
-        Sign up using your mobile number. A One-Time Password (OTP) is sent to ensure secure access.
-        This ensures every user on Kisan Setu is authentic.
-      </p>
+    <div class="ks-section-header">
+      <span class="ks-section-label">The Process</span>
+      <h2>Step by step, for both sides</h2>
+      <p>Farmers get found, landlords hire directly. The entire flow is designed to remove intermediaries.</p>
     </div>
 
-    <div class="process-step">
-      <h5>2. Complete Verification</h5>
-      <p>
-        Upload your Aadhaar details for identity verification. Verification is done securely
-        using OTP-based confirmation to maintain privacy and trust.
-      </p>
-    </div>
+    <div class="row g-4">
 
-    <div class="process-step">
-      <h5>3. Build Your Profile</h5>
-      <p>
-        Add details such as work experience, preferred type of farm work, availability,
-        and location. A complete profile improves your chances of getting hired.
-      </p>
-    </div>
-
-    <div class="process-step">
-      <h5>4. Get Discovered by Employers</h5>
-      <p>
-        Verified employers browse landlord profiles based on their requirements.
-        Your profile is shown only to verified users to ensure safety.
-      </p>
-    </div>
-
-    <div class="process-step">
-      <h5>5. Track Hiring Requests</h5>
-      <p>
-        When an employer is interested, you receive a notification. You can accept
-        or decline requests directly from your dashboard.
-      </p>
-    </div>
-
-    <div class="process-step">
-      <h5>6. Work with Confidence</h5>
-      <p>
-        Once hired, work details remain visible in your hiring history.
-        This builds credibility and helps with future opportunities.
-      </p>
-    </div>
-
-  </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- WORKER PROCESS -->
-<section class="process-section">
-  <div class="container">
-
-    <h2 class="section-title">For Landlords (Hiring farmers)</h2>
-    <p class="section-intro">
-      Landlords can find reliable, verified agricultural farmers quickly and transparently.
-    </p>
-
-    <div class="process-step">
-      <h5>1. Register & Verify</h5>
-      <p>
-        Create an account using your mobile number and complete identity verification
-        to access verified farmer profiles.
-      </p>
-    </div>
-
-    <div class="process-step">
-      <h5>2. Search for Farmers</h5>
-      <p>
-        Browse farmer profiles using filters like location, skill type, availability,
-        and experience.
-      </p>
-    </div>
-
-    <div class="process-step">
-      <h5>3. View Verified Profiles</h5>
-      <p>
-        Access verified profiles with essential details while respecting privacy.
-        Full details are available only to verified employers.
-      </p>
-    </div>
-
-    <div class="process-step">
-      <h5>4. Send Hiring Request</h5>
-      <p>
-        Contact farmers directly through the platform by sending a hiring request.
-        No agents or middlemen involved.
-      </p>
-    </div>
-
-    <div class="process-step">
-      <h5>5. Manage Hiring</h5>
-      <p>
-        Track accepted and rejected requests, manage ongoing work,
-        and maintain a hiring history for future reference.
-      </p>
-    </div>
-
-  </div>
-</section>
-
-<!-- PRE-FOOTER -->
-<section class="pre-footer">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-3 offset-md-1">
-        <ul class="list-unstyled">
-          <li><a href="process.html">How It Works</a></li>
-          <li><a href="info.html">Agricultural Info</a></li>
-          <li><a href="support.html">Support</a></li>
-        </ul>
+      <!-- FARMER STEPS -->
+      <div class="col-lg-6">
+        <div class="ks-role-card">
+          <div class="ks-role-tag farmer-tag">For Farmers</div>
+          <h3 class="ks-role-title">Get hired directly</h3>
+          <p class="ks-role-sub">Build a verified profile, get discovered by employers, and manage your work history — all without paying anyone a commission.</p>
+          <div class="ks-steps">
+            <div class="ks-step">
+              <span class="ks-step-num">01</span>
+              <div class="ks-step-body">
+                <strong>Sign up with your mobile number</strong>
+                <p>Register using your phone. An OTP is sent to verify you're a real person before your account is created.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">02</span>
+              <div class="ks-step-body">
+                <strong>Verify your identity with Aadhaar</strong>
+                <p>Complete Aadhaar OTP verification. This is what makes your profile trusted — employers can see you're a real, verified person.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">03</span>
+              <div class="ks-step-body">
+                <strong>Build your profile</strong>
+                <p>Add your farming skills, preferred work types, location, and availability. Upload a photo. The more complete your profile, the more visible you are.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">04</span>
+              <div class="ks-step-body">
+                <strong>Get discovered by landlords</strong>
+                <p>Verified landlords search profiles by location and skill. Your profile appears in results automatically once complete.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">05</span>
+              <div class="ks-step-body">
+                <strong>Accept or decline hiring requests</strong>
+                <p>When a landlord is interested, you receive a hiring request in your dashboard. Review the details and respond on your own terms.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">06</span>
+              <div class="ks-step-body">
+                <strong>Build your work history</strong>
+                <p>Every accepted request is logged. Over time this builds your credibility and helps you get hired faster in the future.</p>
+              </div>
+            </div>
+          </div>
+          <a href="login-farmer.html" class="ks-role-cta farmer-cta">Get started as a farmer →</a>
+        </div>
       </div>
-      <div class="col-md-3">
-        <ul class="list-unstyled">
-          <li><a href="login-farmer.html">Farmer Login</a></li>
-          <li><a href="login-worker.html">Landlord Login</a></li>
-          <li><a href="index.html">Home</a></li>
-        </ul>
+
+      <!-- LANDLORD STEPS -->
+      <div class="col-lg-6">
+        <div class="ks-role-card landlord-role-card">
+          <div class="ks-role-tag landlord-tag">For Landlords</div>
+          <h3 class="ks-role-title">Hire with confidence</h3>
+          <p class="ks-role-sub">Search verified farmer profiles, send direct hiring requests, and keep a clear record of every engagement — no brokers, no commissions.</p>
+          <div class="ks-steps">
+            <div class="ks-step">
+              <span class="ks-step-num">01</span>
+              <div class="ks-step-body">
+                <strong>Register and verify</strong>
+                <p>Create your account with your mobile number and complete Aadhaar verification. This unlocks access to verified farmer profiles.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">02</span>
+              <div class="ks-step-body">
+                <strong>Activate your subscription</strong>
+                <p>A simple ₹49/month subscription gives landlords full access to search and contact farmers. No hidden charges, cancel anytime.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">03</span>
+              <div class="ks-step-body">
+                <strong>Search farmers by location and skill</strong>
+                <p>Filter profiles by district, work type, and availability. Every profile you see is Aadhaar-verified — no anonymous or fake accounts.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">04</span>
+              <div class="ks-step-body">
+                <strong>Send a direct hiring request</strong>
+                <p>Contact farmers directly through the platform. No agent fees, no middlemen. Just a straightforward request the farmer can accept or decline.</p>
+              </div>
+            </div>
+            <div class="ks-step">
+              <span class="ks-step-num">05</span>
+              <div class="ks-step-body">
+                <strong>Communicate via in-app chat</strong>
+                <p>Once a request is accepted, both parties can message through encrypted in-platform chat. No need to share personal phone numbers.</p>
+              </div>
+            </div>
+          </div>
+          <a href="login-worker.html" class="ks-role-cta landlord-cta">Get started as a landlord →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TRUST GUARANTEES -->
+<section class="proc-guarantee">
+  <div class="container">
+    <div class="ks-section-header light">
+      <span class="ks-section-label light">Our Guarantee</span>
+      <h2>What's true at every step</h2>
+      <p>These principles are non-negotiable, regardless of who you are or where you are on the platform.</p>
+    </div>
+    <div class="proc-guarantee-grid">
+      <div class="proc-guarantee-item">
+        <div class="proc-guarantee-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
+        <h5>No fake profiles</h5>
+        <p>Every account on the platform is Aadhaar-verified before it becomes visible to others.</p>
+      </div>
+      <div class="proc-guarantee-item">
+        <div class="proc-guarantee-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <h5>Zero agent commissions</h5>
+        <p>Farmers keep 100% of what they earn. Landlords pay a flat platform fee, not a cut per hire.</p>
+      </div>
+      <div class="proc-guarantee-item">
+        <div class="proc-guarantee-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <h5>Transparent history</h5>
+        <p>Every hiring request — accepted or declined — is recorded so both sides have a clear, auditable record.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="ks-cta-band">
+  <div class="container">
+    <div class="ks-cta-band-inner">
+      <div class="ks-cta-band-text">
+        <h2>Ready to get started?</h2>
+        <p>Free for farmers. Simple subscription for landlords.</p>
+      </div>
+      <div class="ks-cta-band-btns">
+        <a href="login-farmer.html" class="btn btn-light fw-semibold px-5">Join as Farmer</a>
+        <a href="login-worker.html" class="btn btn-outline-light fw-semibold px-5">Join as Landlord</a>
       </div>
     </div>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer class="site-footer">
-  <div class="container footer-content">
-    <p class="footer-text">© 2026 Kisan Setu. All rights reserved.</p>
-    <p class="footer-brand">🌾 <strong>Kisan Setu</strong></p>
+<footer class="ks-footer-new">
+  <div class="container">
+    <div class="ks-footer-grid">
+      <div class="ks-footer-about">
+        <span class="ks-footer-brand">🌾 Kisan Setu</span>
+        <p>Agricultural employment,<br>direct and verified.</p>
+      </div>
+      <div class="ks-footer-col">
+        <h6>Platform</h6>
+        <a href="process.html">How It Works</a>
+        <a href="info.html">Agricultural Info</a>
+        <a href="support.html">Support</a>
+      </div>
+      <div class="ks-footer-col">
+        <h6>Account</h6>
+        <a href="login-farmer.html">Farmer Login</a>
+        <a href="login-worker.html">Landlord Login</a>
+      </div>
+    </div>
+    <div class="ks-footer-bottom">
+      <p>© 2026 Kisan Setu. All rights reserved.</p>
+    </div>
   </div>
 </footer>
 
