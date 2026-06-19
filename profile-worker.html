@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net www.gstatic.com checkout.razorpay.com api.razorpay.com; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com; img-src 'self' data: blob: *.supabase.co lh3.googleusercontent.com; connect-src 'self' *.supabase.co securetoken.googleapis.com identitytoolkit.googleapis.com www.googleapis.com api.razorpay.com; font-src 'self' cdn.jsdelivr.net fonts.gstatic.com; frame-src api.razorpay.com accounts.google.com; object-src 'none'; base-uri 'self';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Landlord Dashboard | Kisan Setu</title>
 <meta name="description" content="Kisan Setu landlord dashboard — manage your subscription, track hiring requests, and chat with farmers.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='90'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="Assets/Images/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.json">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -27,6 +29,14 @@
   auth.languageCode = 'en';
   let confirmationResult = null;
 
+  function setMsg(el, text, cls) {
+    el.innerHTML = "";
+    const s = document.createElement("span");
+    s.className = cls;
+    s.textContent = text;
+    el.appendChild(s);
+  }
+
   // ── MOBILE EDIT & VERIFY ──────────────────────────────
   window.sendMobileOtp = async function () {
     const mobile = document.getElementById("editMobileInput").value.trim();
@@ -34,13 +44,13 @@
     const btn = document.getElementById("sendMobileOtpBtn");
 
     if (!/^[0-9]{10}$/.test(mobile)) {
-      msg.innerHTML = `<span class="text-danger">Enter a valid 10-digit number.</span>`;
+      setMsg(msg, "Enter a valid 10-digit number.", "text-danger");
       return;
     }
 
     btn.disabled = true;
     btn.innerText = "Sending...";
-    msg.innerHTML = `<span class="text-muted">Sending OTP...</span>`;
+    setMsg(msg, "Sending OTP...", "text-muted");
 
     try {
       if (!window.recaptchaVerifier) {
@@ -50,11 +60,11 @@
       }
       confirmationResult = await signInWithPhoneNumber(auth, "+91" + mobile, window.recaptchaVerifier);
       document.getElementById("mobileOtpRow").classList.remove("d-none");
-      msg.innerHTML = `<span class="text-success">✓ OTP sent to +91${mobile}</span>`;
+      setMsg(msg, "✓ OTP sent to +91" + mobile, "text-success");
       btn.innerText = "Resend OTP";
       btn.disabled = false;
     } catch (err) {
-      msg.innerHTML = `<span class="text-danger">${err.message}</span>`;
+      setMsg(msg, err.message, "text-danger");
       btn.innerText = "Send OTP";
       btn.disabled = false;
       if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; }
@@ -66,8 +76,8 @@
     const msg = document.getElementById("editMobileMsg");
     const mobile = document.getElementById("editMobileInput").value.trim();
 
-    if (otp.length !== 6) { msg.innerHTML = `<span class="text-danger">Enter 6-digit OTP.</span>`; return; }
-    msg.innerHTML = `<span class="text-muted">Verifying...</span>`;
+    if (otp.length !== 6) { setMsg(msg, "Enter 6-digit OTP.", "text-danger"); return; }
+    setMsg(msg, "Verifying...", "text-muted");
 
     try {
       await confirmationResult.confirm(otp);
@@ -98,23 +108,15 @@
     const msg = document.getElementById("editEmailMsg");
     const btn = document.getElementById("sendEmailVerifyBtn");
     if (!email || !/\S+@\S+\.\S+/.test(email)) { msg.innerHTML = `<span class="text-danger">Enter a valid email.</span>`; return; }
-    btn.disabled = true; btn.innerText = "Saving...";
-    await fetch(`https://kyujketzdhkbykybjywu.supabase.co/rest/v1/profiles?id=eq.${window._currentUserId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA",
-        "Authorization": `Bearer ${window._supabaseToken}`,
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify({ email: email })
-    });
-    document.getElementById("displayEmail").innerText = email;
-    document.getElementById("emailVerifiedBadge").classList.remove("d-none");
-    document.getElementById("emailNotVerifiedBadge").classList.add("d-none");
-    document.getElementById("editEmailSection").classList.add("d-none");
-    msg.innerHTML = "";
-    btn.disabled = false; btn.innerText = "Save";
+    btn.disabled = true; btn.innerText = "Sending...";
+    const { error } = await window._supabaseClient.auth.updateUser({ email });
+    if (error) {
+      setMsg(msg, error.message, "text-danger");
+      btn.disabled = false; btn.innerText = "Send Verification";
+      return;
+    }
+    setMsg(msg, "✓ Verification email sent to " + email + ". Click the link to confirm your new address.", "text-success");
+    btn.disabled = true; btn.innerText = "Email sent ✓";
   };
 </script>
 
@@ -383,10 +385,17 @@
 
     <!-- PROFILE INFO -->
     <div class="info-card">
-      <div class="info-card-title">🪪 Profile Details</div>
+      <div class="info-card-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>🪪 Profile Details</span>
+        <button class="edit-btn-sm" onclick="toggleEditProfile()">✏️ Edit</button>
+      </div>
       <div class="info-row">
         <span class="label">Aadhaar Status</span>
         <span id="aadhaarStatus" class="badge bg-warning">Pending</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Location</span>
+        <span class="value" id="profileLocation">—</span>
       </div>
       <div class="info-row">
         <span class="label">Availability</span>
@@ -400,6 +409,29 @@
         <span class="label">Crops</span>
         <span class="value" id="crops">—</span>
       </div>
+
+      <div class="edit-section d-none mt-3" id="editProfileSection">
+        <label>Location</label>
+        <input type="text" class="form-control form-control-sm mb-2" id="editLocation" placeholder="e.g. Ludhiana, Punjab">
+        <label>Availability</label>
+        <select class="form-select form-select-sm mb-2" id="editAvailability">
+          <option value="">Select…</option>
+          <option value="Immediate">Immediate</option>
+          <option value="Within 1 week">Within 1 week</option>
+          <option value="Within 1 month">Within 1 month</option>
+          <option value="Seasonal">Seasonal</option>
+          <option value="Not available">Not available</option>
+        </select>
+        <label>Primary Skill</label>
+        <input type="text" class="form-control form-control-sm mb-2" id="editSkill" placeholder="e.g. Land management">
+        <label>Crops / Land Type</label>
+        <input type="text" class="form-control form-control-sm mb-3" id="editCrops" placeholder="e.g. Wheat fields, Paddy land">
+        <div class="d-flex gap-2">
+          <button class="btn btn-success btn-sm flex-fill" onclick="saveProfile()">Save Changes</button>
+          <button class="btn btn-outline-secondary btn-sm" onclick="toggleEditProfile()">Cancel</button>
+        </div>
+        <div id="editProfileMsg" class="small mt-2 text-center"></div>
+      </div>
     </div>
 
     <!-- SUBSCRIPTION -->
@@ -410,7 +442,8 @@
         <button class="btn btn-warning w-100 fw-bold" onclick="handlePayment()">Activate Subscription — ₹49</button>
       </div>
       <div id="searchFarmersWrapper" class="d-none">
-        <a href="search-farmers.html" class="btn btn-success w-100 fw-bold">🔍 Search Farmers</a>
+        <a href="search-farmers.html" class="btn btn-success w-100 fw-bold mb-2">🔍 Search Farmers</a>
+        <button class="btn btn-outline-danger w-100 btn-sm" onclick="cancelSubscription()">Cancel Subscription</button>
       </div>
     </div>
 
@@ -420,8 +453,34 @@
       <div class="skeleton-card"><div class="skeleton skeleton-line wide"></div><div class="skeleton skeleton-line medium"></div><div class="skeleton skeleton-line short"></div></div>
       <div class="skeleton-card"><div class="skeleton skeleton-line wide"></div><div class="skeleton skeleton-line medium"></div></div>
     </div>
+
+    <!-- DANGER ZONE -->
+    <div class="info-card mt-4" style="border-color:#fdecea;">
+      <div class="info-card-title" style="color:#c0392b;">⚠️ Danger Zone</div>
+      <p style="font-size:0.88rem;color:#666;margin-bottom:12px;">Permanently delete your Kisan Setu account. Your profile will be removed from search results immediately. Aadhaar documents will be deleted within 7 days.</p>
+      <button class="btn btn-outline-danger btn-sm" onclick="showDeleteConfirm()">Delete My Account</button>
+    </div>
   </div>
 </section>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 p-2">
+      <div class="modal-body text-center py-4">
+        <div style="font-size:2.5rem;margin-bottom:12px;">⚠️</div>
+        <h5 class="fw-bold mb-2">Delete your account?</h5>
+        <p class="text-muted" style="font-size:0.9rem;">This cannot be undone. Your profile, hiring requests, and chat messages will be permanently removed.</p>
+        <p class="text-muted" style="font-size:0.85rem;">Type <strong>DELETE</strong> to confirm:</p>
+        <input type="text" class="form-control text-center mb-3" id="deleteConfirmInput" placeholder="Type DELETE here">
+      </div>
+      <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
+        <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-danger px-4" id="confirmDeleteBtn" onclick="deleteAccount()">Delete Account</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <button class="chat-fab" onclick="openChatPanel()">
   💬
@@ -471,6 +530,43 @@ let msgSubscription = null;
 let presenceChannel = null;
 let acceptedJobs = [];
 
+function toggleEditProfile() {
+  document.getElementById("editProfileSection").classList.toggle("d-none");
+  document.getElementById("editProfileMsg").innerHTML = "";
+}
+
+async function saveProfile() {
+  const location = document.getElementById("editLocation").value.trim();
+  const availability = document.getElementById("editAvailability").value;
+  const skill = document.getElementById("editSkill").value.trim();
+  const crops = document.getElementById("editCrops").value.trim();
+  const msg = document.getElementById("editProfileMsg");
+
+  if (!location) { showToast("Location cannot be empty.", "warning"); return; }
+
+  msg.innerHTML = `<span class="text-muted">Saving…</span>`;
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .update({ location, availability, skill, crops })
+    .eq("id", currentUser.id);
+
+  if (error) {
+    const msgEl = document.getElementById("editProfileMsg");
+    const s = document.createElement("span"); s.className = "text-danger"; s.textContent = error.message; msgEl.replaceChildren(s);
+    return;
+  }
+
+  document.getElementById("profileLocation").innerText = location || "—";
+  document.getElementById("workerLocation").innerText = "📍 " + location;
+  document.getElementById("availability").innerText = availability || "—";
+  document.getElementById("skill").innerText = skill || "—";
+  document.getElementById("crops").innerText = crops || "—";
+  document.getElementById("editProfileSection").classList.add("d-none");
+  msg.innerHTML = "";
+  showToast("Profile updated successfully!", "success");
+}
+
 function toggleEditMobile() {
   document.getElementById("editMobileSection").classList.toggle("d-none");
   document.getElementById("mobileOtpRow").classList.add("d-none");
@@ -483,10 +579,9 @@ function toggleEditMobile() {
 
 function toggleEditEmail() {
   document.getElementById("editEmailSection").classList.toggle("d-none");
-  document.getElementById("emailConfirmRow").classList.add("d-none");
   document.getElementById("editEmailMsg").innerHTML = "";
   document.getElementById("editEmailInput").value = "";
-  document.getElementById("sendEmailVerifyBtn").innerText = "Send Link";
+  document.getElementById("sendEmailVerifyBtn").innerText = "Send Verification";
   document.getElementById("sendEmailVerifyBtn").disabled = false;
 }
 
@@ -513,6 +608,11 @@ async function loadProfile() {
   document.getElementById("skill").innerText = profile.skill || "—";
   document.getElementById("crops").innerText = profile.crops || "—";
   document.getElementById("availability").innerText = profile.availability || "—";
+  document.getElementById("profileLocation").innerText = profile.location || "—";
+  document.getElementById("editLocation").value = profile.location || "";
+  document.getElementById("editAvailability").value = profile.availability || "";
+  document.getElementById("editSkill").value = profile.skill || "";
+  document.getElementById("editCrops").value = profile.crops || "";
 
   document.getElementById("displayMobile").innerText = profile.mobile || "Not set";
   document.getElementById("displayEmail").innerText = currentUser.email || "Not set";
@@ -553,7 +653,7 @@ async function fetchSentRequests(workerId) {
     .eq("worker_id", workerId)
     .order("created_at", { ascending: false });
 
-  if (error) { container.innerHTML = `<p class="text-danger small">${error.message}</p>`; return; }
+  if (error) { const p = document.createElement("p"); p.className = "text-danger small"; p.textContent = error.message; container.replaceChildren(p); return; }
   if (!data || data.length === 0) {
     container.innerHTML = `<p class="text-muted small text-center py-3">No requests sent yet.</p>`;
     document.getElementById("statTotal").innerText = 0;
@@ -571,38 +671,87 @@ async function fetchSentRequests(workerId) {
   document.getElementById("statPending").innerText = uniqueJobs.filter(j => j.status === "pending").length;
 
   container.innerHTML = "";
-  uniqueJobs.forEach(job => { container.innerHTML += buildJobCard(job); });
+  uniqueJobs.forEach(job => { container.appendChild(buildJobCard(job)); });
   uniqueJobs.forEach(job => { if (job.status === "declined" && job.cooldown_until) startCountdown(job.id, job.cooldown_until); });
 }
 
 function buildJobCard(job) {
   const farmer = job.farmer;
-  if (job.status === "accepted") {
-    const farmTypes = Array.isArray(farmer?.farm_type) ? farmer.farm_type.join(", ") : farmer?.farm_type || "—";
-    return `<div class="request-card status-accepted">
-      <span class="status-pill accepted">✓ Accepted</span>
-      <div class="farmer-name">${farmer?.full_name || "—"}</div>
-      <div class="detail-row">📍 ${farmer?.location || "—"}</div>
-      <div class="detail-row">📞 ${farmer?.mobile || "—"}</div>
-      <div class="detail-row">🌾 ${farmTypes}</div>
-      <div class="detail-row">🌱 Crops: ${farmer?.crops || "—"}</div>
-      <button class="btn btn-outline-success btn-sm mt-2 w-100" onclick="openChat('${job.id}','${job.farmer_id}','${farmer?.full_name?.replace(/'/g,"\\'")}')">💬 Chat with ${farmer?.full_name || "Farmer"}</button>
-    </div>`;
+  const card = document.createElement("div");
+
+  function addRow(text) {
+    const row = document.createElement("div");
+    row.className = "detail-row";
+    row.textContent = text;
+    card.appendChild(row);
   }
+
+  if (job.status === "accepted") {
+    card.className = "request-card status-accepted";
+    const pill = document.createElement("span");
+    pill.className = "status-pill accepted";
+    pill.textContent = "✓ Accepted";
+    card.appendChild(pill);
+    const nameEl = document.createElement("div");
+    nameEl.className = "farmer-name";
+    nameEl.textContent = farmer?.full_name || "—";
+    card.appendChild(nameEl);
+    const farmTypes = Array.isArray(farmer?.farm_type) ? farmer.farm_type.join(", ") : farmer?.farm_type || "—";
+    addRow("📍 " + (farmer?.location || "—"));
+    addRow("📞 " + (farmer?.mobile || "—"));
+    addRow("🌾 " + farmTypes);
+    addRow("🌱 Crops: " + (farmer?.crops || "—"));
+    const chatBtn = document.createElement("button");
+    chatBtn.className = "btn btn-outline-success btn-sm mt-2 w-100";
+    chatBtn.textContent = "💬 Chat with " + (farmer?.full_name || "Farmer");
+    chatBtn.addEventListener("click", () => openChat(job.id, job.farmer_id, farmer?.full_name || "Farmer"));
+    card.appendChild(chatBtn);
+    return card;
+  }
+
   if (job.status === "declined") {
+    card.className = "request-card status-declined";
+    const pill = document.createElement("span");
+    pill.className = "status-pill declined";
+    pill.textContent = "✕ Declined";
+    card.appendChild(pill);
+    const nameEl = document.createElement("div");
+    nameEl.className = "farmer-name";
+    nameEl.textContent = farmer?.full_name || "—";
+    card.appendChild(nameEl);
     const cooldown = job.cooldown_until ? new Date(job.cooldown_until) : null;
     const inCooldown = cooldown && cooldown > new Date();
-    return `<div class="request-card status-declined">
-      <span class="status-pill declined">✕ Declined</span>
-      <div class="farmer-name">${farmer?.full_name || "—"}</div>
-      ${inCooldown ? `<div class="countdown-text">⏳ Resend in: <span id="countdown-${job.id}">calculating...</span></div>` : `<div class="detail-row" style="color:#2e7d32;margin-top:6px">✅ Cooldown over — you can resend.</div>`}
-    </div>`;
+    if (inCooldown) {
+      const cd = document.createElement("div");
+      cd.className = "countdown-text";
+      cd.textContent = "⏳ Resend in: ";
+      const span = document.createElement("span");
+      span.id = `countdown-${job.id}`;
+      span.textContent = "calculating...";
+      cd.appendChild(span);
+      card.appendChild(cd);
+    } else {
+      const over = document.createElement("div");
+      over.className = "detail-row";
+      over.style.color = "#2e7d32";
+      over.style.marginTop = "6px";
+      over.textContent = "✅ Cooldown over — you can resend.";
+      card.appendChild(over);
+    }
+    return card;
   }
-  return `<div class="request-card status-pending">
-    <span class="status-pill pending">⏱ Pending</span>
-    <div class="farmer-name">${farmer?.full_name || "—"}</div>
-    <div class="detail-row">📍 ${farmer?.location || "—"}</div>
-  </div>`;
+
+  card.className = "request-card status-pending";
+  const pill = document.createElement("span");
+  pill.className = "status-pill pending";
+  pill.textContent = "⏱ Pending";
+  card.appendChild(pill);
+  const nameEl = document.createElement("div");
+  nameEl.className = "farmer-name";
+  nameEl.textContent = farmer?.full_name || "—";
+  card.appendChild(nameEl);
+  addRow("📍 " + (farmer?.location || "—"));
+  return card;
 }
 
 function startCountdown(jobId, cooldownUntil) {
@@ -620,19 +769,35 @@ function startCountdown(jobId, cooldownUntil) {
 async function handlePayment() {
   if (!currentUser) { showToast("Session not found. Please log in again.", "error"); return; }
   try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { showToast("Session expired. Please log in again.", "error"); return; }
     const res = await fetch("https://kyujketzdhkbykybjywu.supabase.co/functions/v1/create-subscription", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5dWprZXR6ZGhrYnlreWJqeXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODAwNjcsImV4cCI6MjA4MzM1NjA2N30.CRXq5CtQ6WIkBeQA-52YUYiTc3GXxJ9Gt4X05D40VQA" },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
       body: JSON.stringify({ user_id: currentUser.id, user_email: currentUser.email }),
     });
     const { subscription_id, error } = await res.json();
     if (error || !subscription_id) { showToast("Could not create subscription: " + (error || "unknown error"), "error"); return; }
     const options = {
       key: "rzp_test_STZ6trtojWVF57", subscription_id,
-      name: "Kisan Setu", description: "Landlord Subscription — ₹20/month",
+      name: "Kisan Setu", description: "Landlord Subscription — ₹49/month",
       prefill: { email: currentUser.email },
-      handler: async function () {
-        await supabaseClient.from("profiles").update({ subscription_active: true }).eq("id", currentUser.id);
+      handler: async function (response) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const verifyRes = await fetch("https://kyujketzdhkbykybjywu.supabase.co/functions/v1/verify-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
+          body: JSON.stringify({
+            payment_id: response.razorpay_payment_id,
+            subscription_id: response.razorpay_subscription_id,
+            signature: response.razorpay_signature,
+          }),
+        });
+        const result = await verifyRes.json();
+        if (!verifyRes.ok || !result.success) {
+          showToast("Payment verification failed. Please contact support.", "error");
+          return;
+        }
         showToast("Subscription activated! Refreshing…", "success");
         setTimeout(() => location.reload(), 1800);
       },
@@ -642,7 +807,47 @@ async function handlePayment() {
   } catch (err) { showToast("Something went wrong: " + err.message, "error"); }
 }
 
+async function cancelSubscription() {
+  if (!confirm("Cancel your subscription? You will lose access to farmer search at the end of the current billing period.")) return;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  const res = await fetch("https://kyujketzdhkbykybjywu.supabase.co/functions/v1/cancel-subscription", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
+  });
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok) { showToast("Could not cancel: " + (result.error || "unknown error"), "error"); return; }
+  showToast("Subscription cancelled. Access continues until your billing period ends.", "info");
+  document.querySelector("[onclick='cancelSubscription()']").classList.add("d-none");
+}
+
 async function logout() { await supabaseClient.auth.signOut(); location.href = "index.html"; }
+
+function showDeleteConfirm() {
+  document.getElementById("deleteConfirmInput").value = "";
+  new bootstrap.Modal(document.getElementById("deleteModal")).show();
+}
+
+async function deleteAccount() {
+  if (document.getElementById("deleteConfirmInput").value.trim() !== "DELETE") {
+    showToast("Please type DELETE to confirm.", "warning");
+    return;
+  }
+  const btn = document.getElementById("confirmDeleteBtn");
+  ksSetBtnLoading(btn, "Deleting…");
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  const res = await fetch("https://kyujketzdhkbykybjywu.supabase.co/functions/v1/delete-account", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    showToast("Deletion failed: " + (err.error || "unknown error"), "error");
+    ksResetBtn(btn);
+    return;
+  }
+  await supabaseClient.auth.signOut();
+  window.location.replace("index.html");
+}
 
 function openChatPanel() { document.getElementById("chatPanel").classList.add("open"); document.getElementById("chatOverlay").classList.add("show"); showChatList(); }
 function closeChatPanel() {
@@ -666,13 +871,37 @@ async function showChatList() {
     const initials = name.split(" ").map(w => w[0]).join("").substring(0,2).toUpperCase();
     const { data: lastMsgs } = await supabaseClient.from("messages").select("content, image_url, is_read, sender_id").eq("job_id", job.id).order("created_at", { ascending: false }).limit(1);
     const last = lastMsgs?.[0];
-    const preview = last ? (last.image_url ? "📷 Image" : last.content) : "No messages yet";
+    const previewText = last ? (last.image_url ? "📷 Image" : last.content) : "No messages yet";
     const hasUnread = last && !last.is_read && last.sender_id !== currentUser.id;
-    listEl.innerHTML += `<div class="chat-list-item" onclick="openChat('${job.id}','${job.farmer_id}','${name.replace(/'/g,"\\'")}')">
-      <div class="chat-list-avatar">${initials}</div>
-      <div class="chat-list-info"><div class="chat-list-name">${name}</div><div class="chat-list-preview">${preview}</div></div>
-      ${hasUnread ? `<div class="chat-unread-dot"></div>` : ""}
-    </div>`;
+
+    const item = document.createElement("div");
+    item.className = "chat-list-item";
+    item.addEventListener("click", () => openChat(job.id, job.farmer_id, name));
+
+    const avatar = document.createElement("div");
+    avatar.className = "chat-list-avatar";
+    avatar.textContent = initials;
+    item.appendChild(avatar);
+
+    const info = document.createElement("div");
+    info.className = "chat-list-info";
+    const nameEl = document.createElement("div");
+    nameEl.className = "chat-list-name";
+    nameEl.textContent = name;
+    const previewEl = document.createElement("div");
+    previewEl.className = "chat-list-preview";
+    previewEl.textContent = previewText;
+    info.appendChild(nameEl);
+    info.appendChild(previewEl);
+    item.appendChild(info);
+
+    if (hasUnread) {
+      const dot = document.createElement("div");
+      dot.className = "chat-unread-dot";
+      item.appendChild(dot);
+    }
+
+    listEl.appendChild(item);
   }
 }
 
@@ -700,14 +929,36 @@ function appendMessage(msg) {
   const container = document.getElementById("chatMessages");
   const isSent = msg.sender_id === currentUser.id;
   const time = new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  const readStatus = isSent ? `<span class="msg-read">${msg.is_read ? "✓✓ Seen" : "✓ Sent"}</span>` : "";
-  let content = "";
-  if (msg.image_url) content = `<img src="${msg.image_url}" onclick="window.open('${msg.image_url}','_blank')" alt="image">`;
-  if (msg.content) content += `<span>${msg.content}</span>`;
+
   const div = document.createElement("div");
   div.className = `msg-bubble ${isSent ? "sent" : "received"}`;
   div.id = `msg-${msg.id}`;
-  div.innerHTML = `${content}<span class="msg-time">${time}</span>${readStatus}`;
+
+  if (msg.image_url) {
+    const img = document.createElement("img");
+    img.src = msg.image_url;
+    img.alt = "image";
+    img.onclick = () => window.open(msg.image_url, "_blank");
+    div.appendChild(img);
+  }
+  if (msg.content) {
+    const span = document.createElement("span");
+    span.textContent = msg.content;
+    div.appendChild(span);
+  }
+
+  const timeSpan = document.createElement("span");
+  timeSpan.className = "msg-time";
+  timeSpan.textContent = time;
+  div.appendChild(timeSpan);
+
+  if (isSent) {
+    const readSpan = document.createElement("span");
+    readSpan.className = "msg-read";
+    readSpan.textContent = msg.is_read ? "✓✓ Seen" : "✓ Sent";
+    div.appendChild(readSpan);
+  }
+
   container.appendChild(div);
 }
 
@@ -774,5 +1025,6 @@ loadProfile();
   supabaseClient.auth.onAuthStateChange((event, session) => { if (!session) window.location.replace("index.html"); });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js");</script>
 </body>
 </html>
