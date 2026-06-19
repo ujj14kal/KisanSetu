@@ -108,10 +108,14 @@
   window.showToast = function (message, type = "success", duration = 3800) {
     const toast = document.createElement("div");
     toast.className = `ks-toast ks-toast-${type}`;
-    toast.innerHTML = `
-      <span class="ks-toast-icon">${ICONS[type] || "✓"}</span>
-      <span class="ks-toast-msg">${message}</span>
-    `;
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "ks-toast-icon";
+    iconSpan.textContent = ICONS[type] || "✓";
+    const msgSpan = document.createElement("span");
+    msgSpan.className = "ks-toast-msg";
+    msgSpan.textContent = message;
+    toast.appendChild(iconSpan);
+    toast.appendChild(msgSpan);
     toast.onclick = () => dismissToast(toast);
     container.appendChild(toast);
     requestAnimationFrame(() => {
@@ -159,5 +163,15 @@
   window.ksResetBtn = function (btn) {
     btn.disabled = false;
     if (btn._originalHTML) btn.innerHTML = btn._originalHTML;
+  };
+
+  window.escHtml = function (str) {
+    if (str == null) return "—";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#x27;");
   };
 })();

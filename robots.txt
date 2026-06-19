@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /profile-farmer.html
+Disallow: /profile-worker.html
+Disallow: /search-farmers.html
+Disallow: /create-account-farmer.html
+Disallow: /create-account-worker.html
+Disallow: /auth-callback.html
+Disallow: /reset-password.html
+Disallow: /login-farmer.html
+Disallow: /login-worker.html
+
+Sitemap: https://kisansetu.in/sitemap.xml
