@@ -124,6 +124,7 @@
   );
 
   let isSubscribed = false;
+  const RAZORPAY_KEY_ID = "rzp_test_STZ6trtojWVF57";
   let sessionUser = null;
   // Map of farmerId -> latest job { status, cooldown_until }
   let existingRequests = {};
@@ -401,7 +402,7 @@ async function handlePayment() {
     }
 
     const options = {
-      key: "rzp_test_STZ6trtojWVF57",
+      key: RAZORPAY_KEY_ID,
       subscription_id: subscription_id,
       name: "Kisan Setu",
       description: "Landlord Subscription — ₹49/month",

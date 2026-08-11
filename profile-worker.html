@@ -522,6 +522,8 @@ const supabaseClient = createClient(
 
 window._supabaseClient = supabaseClient;
 
+const RAZORPAY_KEY_ID = "rzp_test_STZ6trtojWVF57";
+
 let currentUser = null;
 let activeJobId = null;
 let activeReceiverId = null;
@@ -779,7 +781,7 @@ async function handlePayment() {
     const { subscription_id, error } = await res.json();
     if (error || !subscription_id) { showToast("Could not create subscription: " + (error || "unknown error"), "error"); return; }
     const options = {
-      key: "rzp_test_TOb333IXRbWIz", subscription_id,
+      key: RAZORPAY_KEY_ID, subscription_id,
       name: "Kisan Setu", description: "Landlord Subscription — ₹49/month",
       prefill: { email: currentUser.email },
       handler: async function (response) {
