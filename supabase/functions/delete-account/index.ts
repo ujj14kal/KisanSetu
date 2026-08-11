@@ -1,12 +1,19 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const ALLOWED_ORIGIN = "https://kisansetu.in";
+const ALLOWED_ORIGINS = new Set([
+  "https://kisansetu.in",
+  "https://www.kisansetu.in",
+  "https://kisan-setu-vert.vercel.app",
+]);
 
 function cors(req: Request) {
   const origin = req.headers.get("origin") || "";
+  const allowedOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "https://kisansetu.in";
   return {
-    "Access-Control-Allow-Origin": origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN,
+    "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
   };
 }
 
