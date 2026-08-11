@@ -26,6 +26,11 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   const { request } = e;
+  const url = new URL(request.url);
+
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    return;
+  }
 
   // Never intercept Supabase, Firebase, or Razorpay API calls
   if (
