@@ -783,7 +783,7 @@ async function handlePayment() {
       return;
     }
     const options = {
-      key: "rzp_test_TOkQ1GvR7tc7O5",
+      key: "rzp_test_TOkQ1GvR7tc7O5",subscription_id: subscription_id,
       name: "Kisan Setu", description: "Landlord Subscription — ₹49/month",
       prefill: { email: currentUser.email },
       handler: async function (response) {
