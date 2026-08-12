@@ -1,6 +1,6 @@
 {
-  "name": "Kisan Setu",
-  "short_name": "KisanSetu",
+  "name": "Kisaan Setu",
+  "short_name": "KisaanSetu",
   "description": "Agricultural employment platform connecting farmers and landlords across India.",
   "start_url": "/index.html",
   "display": "standalone",

@@ -1,4 +1,4 @@
-/* Kisan Setu — shared utilities */
+/* Kisaan Setu — shared utilities */
 (function () {
   const css = `
     #ks-toast-container {

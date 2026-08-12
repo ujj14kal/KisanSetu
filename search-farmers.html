@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net www.gstatic.com checkout.razorpay.com api.razorpay.com cdn.razorpay.com; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com; img-src 'self' data: blob: *.supabase.co lh3.googleusercontent.com; connect-src 'self' *.supabase.co wss://*.supabase.co securetoken.googleapis.com identitytoolkit.googleapis.com www.googleapis.com api.razorpay.com checkout.razorpay.com cdn.razorpay.com cdn.jsdelivr.net www.gstatic.com; font-src 'self' cdn.jsdelivr.net fonts.gstatic.com; frame-src api.razorpay.com checkout.razorpay.com accounts.google.com; object-src 'none'; base-uri 'self';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Search Farmers | Kisan Setu</title>
-  <meta name="description" content="Find verified farmers near you on Kisan Setu. Search by location and send hiring requests.">
+  <title>Search Farmers | Kisaan Setu</title>
+  <meta name="description" content="Find verified farmers near you on Kisaan Setu. Search by location and send hiring requests.">
 
   <link rel="icon" href="Assets/Images/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.json">
@@ -55,7 +55,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
   <div class="container">
-    <a class="navbar-brand fw-bold text-success" href="index.html">🌾 Kisan Setu</a>
+    <a class="navbar-brand fw-bold text-success" href="index.html">🌾 Kisaan Setu</a>
     <button class="btn btn-outline-success btn-sm" onclick="logout()">Logout</button>
   </div>
 </nav>
@@ -404,7 +404,7 @@ async function handlePayment() {
     const options = {
       key: key_id,
       subscription_id: subscription_id,
-      name: "Kisan Setu",
+      name: "Kisaan Setu",
       description: "Landlord Subscription — ₹49/month",
       prefill: { email: sessionUser.email },
       handler: async function (response) {
