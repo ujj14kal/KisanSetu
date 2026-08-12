@@ -124,7 +124,6 @@
   );
 
   let isSubscribed = false;
-  const RAZORPAY_KEY_ID = "rzp_test_STZ6trtojWVF57";
   let sessionUser = null;
   // Map of farmerId -> latest job { status, cooldown_until }
   let existingRequests = {};
@@ -395,14 +394,15 @@ async function handlePayment() {
       }
     );
 
-    const { subscription_id, error } = await res.json();
-    if (error || !subscription_id) {
-      showToast("Could not create subscription: " + (error || "unknown error"), "error");
+    const { subscription_id, key_id, error, missing } = await res.json();
+    if (!res.ok || error || !subscription_id || !key_id) {
+      const detail = error || (missing ? `Missing config: ${Array.isArray(missing) ? missing.join(", ") : missing}` : "unknown error");
+      showToast("Could not create subscription: " + detail, "error");
       return;
     }
 
     const options = {
-      key: RAZORPAY_KEY_ID,
+      key: key_id,
       subscription_id: subscription_id,
       name: "Kisan Setu",
       description: "Landlord Subscription — ₹49/month",
@@ -419,14 +419,15 @@ async function handlePayment() {
             },
             body: JSON.stringify({
               payment_id: response.razorpay_payment_id,
-              subscription_id: response.razorpay_subscription_id,
+              subscription_id,
+              checkout_subscription_id: response.razorpay_subscription_id,
               signature: response.razorpay_signature,
             }),
           }
         );
         const result = await verifyRes.json();
         if (!verifyRes.ok || !result.success) {
-          showToast("Payment verification failed. Please contact support.", "error");
+          showToast("Payment verification failed: " + (result.error || "Please contact support."), "error");
           return;
         }
         showToast("Subscription activated! Refreshing…", "success");
