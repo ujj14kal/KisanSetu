@@ -522,8 +522,6 @@ const supabaseClient = createClient(
 
 window._supabaseClient = supabaseClient;
 
-const RAZORPAY_KEY_ID = "rzp_test_STZ6trtojWVF57";
-
 let currentUser = null;
 let activeJobId = null;
 let activeReceiverId = null;
@@ -778,10 +776,14 @@ async function handlePayment() {
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
       body: JSON.stringify({ user_id: currentUser.id, user_email: currentUser.email }),
     });
-    const { subscription_id, error } = await res.json();
-    if (error || !subscription_id) { showToast("Could not create subscription: " + (error || "unknown error"), "error"); return; }
+    const { subscription_id, key_id, error, missing } = await res.json();
+    if (!res.ok || error || !subscription_id || !key_id) {
+      const detail = error || (missing ? `Missing config: ${Array.isArray(missing) ? missing.join(", ") : missing}` : "unknown error");
+      showToast("Could not create subscription: " + detail, "error");
+      return;
+    }
     const options = {
-      key: RAZORPAY_KEY_ID, subscription_id,
+      key: "rzp_test_TOkQ1GvR7tc7O5",
       name: "Kisan Setu", description: "Landlord Subscription — ₹49/month",
       prefill: { email: currentUser.email },
       handler: async function (response) {
@@ -791,13 +793,14 @@ async function handlePayment() {
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
           body: JSON.stringify({
             payment_id: response.razorpay_payment_id,
-            subscription_id: response.razorpay_subscription_id,
+            subscription_id,
+            checkout_subscription_id: response.razorpay_subscription_id,
             signature: response.razorpay_signature,
           }),
         });
         const result = await verifyRes.json();
         if (!verifyRes.ok || !result.success) {
-          showToast("Payment verification failed. Please contact support.", "error");
+          showToast("Payment verification failed: " + (result.error || "Please contact support."), "error");
           return;
         }
         showToast("Subscription activated! Refreshing…", "success");

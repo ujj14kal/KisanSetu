@@ -17,6 +17,34 @@ function cors(req: Request) {
   };
 }
 
+function getEnv(names: string[]) {
+  for (const name of names) {
+    const value = Deno.env.get(name);
+    if (value) return value;
+  }
+  return null;
+}
+
+function getSupabasePublishableKey() {
+  const publishableKeys = Deno.env.get("SUPABASE_PUBLISHABLE_KEYS");
+  if (publishableKeys) {
+    try {
+      const parsed = JSON.parse(publishableKeys);
+      if (parsed?.default) return parsed.default;
+    } catch {
+      // Fall back to legacy env below.
+    }
+  }
+  return Deno.env.get("SUPABASE_ANON_KEY");
+}
+
+function json(req: Request, body: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...cors(req), "Content-Type": "application/json" },
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: cors(req) });
@@ -26,31 +54,36 @@ Deno.serve(async (req) => {
     // Verify caller is authenticated
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...cors(req), "Content-Type": "application/json" },
-      });
+      return json(req, { error: "Unauthorized" }, 401);
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseAnonKey = getSupabasePublishableKey();
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return json(req, { error: "Server misconfiguration", missing: "Supabase API key" }, 500);
     }
 
     const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
+      supabaseUrl,
+      supabaseAnonKey,
       { global: { headers: { Authorization: authHeader } } }
     );
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     if (authErr || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...cors(req), "Content-Type": "application/json" },
-      });
+      return json(req, { error: "Unauthorized" }, 401);
     }
 
-    const keyId = Deno.env.get("RAZORPAY_KEY_ID");
-    const keySecret = Deno.env.get("RAZORPAY_KEY_SECRET") || Deno.env.get("RAZORPAY_SECRET");
-    const planId = Deno.env.get("RAZORPAY_PLAN_ID");
+    const keyId = getEnv(["RAZORPAY_KEY_ID", "RAZORPAY_PUBLIC_KEY", "RAZORPAY_KEY"]);
+    const keySecret = getEnv(["RAZORPAY_KEY_SECRET", "RAZORPAY_SECRET", "RAZORPAY_SECRET_KEY"]);
+    const planId = getEnv(["RAZORPAY_PLAN_ID", "RAZORPAY_SUBSCRIPTION_PLAN_ID"]);
 
     if (!keyId || !keySecret || !planId) {
-      return new Response(JSON.stringify({ error: "Server misconfiguration" }), {
-        status: 500, headers: { ...cors(req), "Content-Type": "application/json" },
-      });
+      const missing = [
+        !keyId && "RAZORPAY_KEY_ID",
+        !keySecret && "RAZORPAY_KEY_SECRET",
+        !planId && "RAZORPAY_PLAN_ID",
+      ].filter(Boolean);
+      return json(req, { error: "Server misconfiguration", missing }, 500);
     }
 
     const credentials = btoa(`${keyId}:${keySecret}`);
@@ -70,17 +103,14 @@ Deno.serve(async (req) => {
     const sub = await rzpRes.json();
 
     if (!rzpRes.ok || !sub.id) {
-      return new Response(JSON.stringify({ error: sub.error?.description || "Failed to create subscription" }), {
-        status: 500, headers: { ...cors(req), "Content-Type": "application/json" },
-      });
+      return json(req, {
+        error: sub.error?.description || "Failed to create subscription",
+        code: sub.error?.code,
+      }, 500);
     }
 
-    return new Response(JSON.stringify({ subscription_id: sub.id }), {
-      status: 200, headers: { ...cors(req), "Content-Type": "application/json" },
-    });
+    return json(req, { subscription_id: sub.id, key_id: keyId });
   } catch (err) {
-    return new Response(JSON.stringify({ error: (err as Error).message }), {
-      status: 500, headers: { ...cors(req), "Content-Type": "application/json" },
-    });
+    return json(req, { error: (err as Error).message }, 500);
   }
 });
